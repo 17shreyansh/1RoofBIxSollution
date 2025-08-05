@@ -9,11 +9,7 @@ const blogSchema = new mongoose.Schema({
   featuredImage: String,
   category: String,
   tags: [String],
-  author: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: 'User',
-    required: true
-  },
+  author: { type: String, default: 'Admin' },
   readTime: Number,
   views: { type: Number, default: 0 },
   isPublished: { type: Boolean, default: false },
@@ -33,8 +29,39 @@ blogSchema.pre('save', function(next) {
   if (this.isPublished && !this.publishedAt) {
     this.publishedAt = new Date();
   }
+  
+  // Normalize tags
+  if (this.tags) {
+    this.tags = this.constructor.normalizeTags(this.tags);
+  }
+  
   next();
 });
+
+blogSchema.statics.normalizeTags = function(tagData) {
+  if (!tagData) return [];
+  
+  let result = [];
+  
+  if (typeof tagData === 'string') {
+    try {
+      const parsed = JSON.parse(tagData);
+      result = Array.isArray(parsed) ? parsed.flat(Infinity) : [parsed];
+    } catch {
+      result = tagData.split(',').map(t => t.trim()).filter(t => t);
+    }
+  } else if (Array.isArray(tagData)) {
+    result = tagData.flat(Infinity);
+  } else {
+    result = [String(tagData)];
+  }
+  
+  return [...new Set(
+    result
+      .map(tag => String(tag).replace(/["\'\[\]]/g, '').trim())
+      .filter(tag => tag && tag.length > 0 && tag !== 'undefined' && tag !== 'null')
+  )];
+};
 
 blogSchema.pre('insertMany', function(next, docs) {
   docs.forEach(doc => {

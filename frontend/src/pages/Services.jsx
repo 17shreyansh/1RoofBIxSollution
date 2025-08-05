@@ -1,67 +1,83 @@
 import { useState, useEffect } from 'react';
 import { motion } from 'framer-motion';
-import { Container, Row, Col, Card, Button } from 'react-bootstrap';
+import { Container, Row, Col, Card, Button, Badge } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
 import { ArrowRight, Code, Megaphone, Palette, ShoppingCart, Smartphone, Users, Star, CheckCircle } from 'lucide-react';
 import api from '../utils/api';
 
 const Services = () => {
-  const [services, setServices] = useState([
+  const [services, setServices] = useState([]);
+  const [loading, setLoading] = useState(true);
+  
+  // Enhanced services with better mock data
+  const defaultServices = [
     { 
       _id: '1', 
       name: 'Web Development', 
-      description: 'Custom websites and web applications built with modern technologies for optimal performance and user experience', 
+      description: 'Transform your digital presence with cutting-edge web development solutions. We create responsive, fast, and user-friendly websites that drive results.', 
       slug: 'web-development',
       icon: Code,
-      features: ['Responsive Design', 'Modern Frameworks', 'SEO Optimized', 'Fast Loading'],
-      price: 'Starting at $2,999'
+      features: ['Responsive Design', 'Modern Frameworks', 'SEO Optimized', 'Fast Loading', 'Security Best Practices'],
+      pricing: { standard: { price: 4999 } },
+      category: 'Development',
+      deliveryTime: '2-4 weeks'
     },
     { 
       _id: '2', 
       name: 'Digital Marketing', 
-      description: 'Comprehensive digital marketing strategies including SEO, PPC, social media, and content marketing', 
+      description: 'Boost your online presence with comprehensive digital marketing strategies. We help businesses grow through SEO, PPC, and social media.', 
       slug: 'digital-marketing',
       icon: Megaphone,
-      features: ['SEO Optimization', 'PPC Campaigns', 'Social Media', 'Analytics'],
-      price: 'Starting at $1,499/mo'
+      features: ['SEO Optimization', 'PPC Campaigns', 'Social Media', 'Content Marketing', 'Analytics & Reporting'],
+      pricing: { standard: { price: 2999 } },
+      category: 'Marketing',
+      deliveryTime: 'Ongoing'
     },
     { 
       _id: '3', 
       name: 'Brand Design', 
-      description: 'Complete brand identity design including logos, visual guidelines, and marketing materials', 
+      description: 'Create a memorable brand identity that stands out. Complete brand design including logos, guidelines, and marketing materials.', 
       slug: 'brand-design',
       icon: Palette,
-      features: ['Logo Design', 'Brand Guidelines', 'Marketing Materials', 'Visual Identity'],
-      price: 'Starting at $1,999'
+      features: ['Logo Design', 'Brand Guidelines', 'Marketing Materials', 'Visual Identity', 'Brand Strategy'],
+      pricing: { standard: { price: 1999 } },
+      category: 'Design',
+      deliveryTime: '1-2 weeks'
     },
     { 
       _id: '4', 
       name: 'E-commerce Solutions', 
-      description: 'Full-featured online stores with payment integration, inventory management, and optimization', 
+      description: 'Build powerful online stores that convert visitors into customers. Full-featured e-commerce with payment integration and management tools.', 
       slug: 'ecommerce',
       icon: ShoppingCart,
-      features: ['Payment Integration', 'Inventory Management', 'Mobile Optimized', 'Analytics'],
-      price: 'Starting at $4,999'
+      features: ['Payment Integration', 'Inventory Management', 'Mobile Optimized', 'Analytics', 'Security Features'],
+      pricing: { standard: { price: 6999 } },
+      category: 'Development',
+      deliveryTime: '3-6 weeks'
     },
     { 
       _id: '5', 
       name: 'Mobile App Development', 
-      description: 'Native and cross-platform mobile applications for iOS and Android with modern features', 
+      description: 'Native and cross-platform mobile applications for iOS and Android. Modern features with seamless user experience.', 
       slug: 'mobile-apps',
       icon: Smartphone,
-      features: ['iOS & Android', 'Cross-Platform', 'API Integration', 'App Store Deployment'],
-      price: 'Starting at $7,999'
+      features: ['iOS & Android', 'Cross-Platform', 'API Integration', 'App Store Deployment', 'Push Notifications'],
+      pricing: { standard: { price: 9999 } },
+      category: 'Development',
+      deliveryTime: '6-12 weeks'
     },
     { 
       _id: '6', 
       name: 'Business Consulting', 
-      description: 'Strategic technology consulting to help businesses optimize their digital transformation journey', 
+      description: 'Strategic technology consulting to optimize your digital transformation. Expert guidance for sustainable business growth.', 
       slug: 'consulting',
       icon: Users,
-      features: ['Strategy Planning', 'Technology Audit', 'Process Optimization', 'Growth Planning'],
-      price: 'Starting at $199/hr'
+      features: ['Strategy Planning', 'Technology Audit', 'Process Optimization', 'Growth Planning', 'Implementation Support'],
+      pricing: { standard: { price: 299 } },
+      category: 'Consulting',
+      deliveryTime: 'Flexible'
     }
-  ]);
+  ];
 
   useEffect(() => {
     fetchServices();
@@ -69,14 +85,47 @@ const Services = () => {
 
   const fetchServices = async () => {
     try {
+      setLoading(true);
       const response = await api.get('/services');
       if (response.data?.length) {
-        setServices(response.data);
+        // Map icons to services
+        const servicesWithIcons = response.data.map(service => {
+          const defaultService = defaultServices.find(ds => ds.slug === service.slug);
+          return {
+            ...service,
+            icon: defaultService?.icon || Code
+          };
+        });
+        setServices(servicesWithIcons);
+      } else {
+        setServices(defaultServices);
       }
     } catch (error) {
       console.error('Error fetching services:', error);
+      setServices(defaultServices);
+    } finally {
+      setLoading(false);
     }
   };
+
+  if (loading) {
+    return (
+      <div style={{ 
+        minHeight: '100vh', 
+        display: 'flex', 
+        alignItems: 'center', 
+        justifyContent: 'center',
+        paddingTop: '140px'
+      }}>
+        <div className="text-center">
+          <div className="spinner-border text-primary" role="status" style={{ width: '3rem', height: '3rem' }}>
+            <span className="visually-hidden">Loading...</span>
+          </div>
+          <p style={{ marginTop: '1rem', color: '#6b7280' }}>Loading services...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div style={{ minHeight: '100vh' }}>
@@ -239,7 +288,7 @@ const Services = () => {
                           padding: '0.25rem 0.75rem',
                           borderRadius: '20px'
                         }}>
-                          {service.price || 'Contact for pricing'}
+                          {service.pricing?.standard?.price ? `$${service.pricing.standard.price.toLocaleString()}` : 'Contact for pricing'}
                         </span>
                       </div>
                       
@@ -272,6 +321,27 @@ const Services = () => {
                         ))}
                       </div>
                       
+                      <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '1rem' }}>
+                        <Badge 
+                          bg="secondary" 
+                          style={{
+                            fontSize: '0.75rem',
+                            padding: '0.25rem 0.5rem'
+                          }}
+                        >
+                          {service.category}
+                        </Badge>
+                        <Badge 
+                          bg="info" 
+                          style={{
+                            fontSize: '0.75rem',
+                            padding: '0.25rem 0.5rem'
+                          }}
+                        >
+                          {service.deliveryTime}
+                        </Badge>
+                      </div>
+                      
                       <Button 
                         as={Link}
                         to={`/services/${service.slug}`}
@@ -298,7 +368,7 @@ const Services = () => {
                           e.target.style.boxShadow = 'none';
                         }}
                       >
-                        Learn More
+                        View Details
                         <ArrowRight size={16} />
                       </Button>
                     </Card>

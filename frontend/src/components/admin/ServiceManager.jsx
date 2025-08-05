@@ -1,39 +1,30 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 import { 
   Table, 
   Button, 
-  Modal, 
-  Form, 
-  Input, 
-  Select, 
-  Switch, 
-  Upload, 
   message, 
   Space, 
+  Tag, 
   Popconfirm,
-  Tag,
-  Image
+  Card,
+  Switch,
+  Typography
 } from 'antd';
 import { 
   PlusOutlined, 
   EditOutlined, 
   DeleteOutlined, 
-  UploadOutlined,
-  EyeOutlined,
-  EyeInvisibleOutlined
+  EyeOutlined
 } from '@ant-design/icons';
-
 import api from '../../utils/api';
 
-const { Option } = Select;
-const { TextArea } = Input;
+const { Title } = Typography;
 
 const ServiceManager = () => {
+  const navigate = useNavigate();
   const [services, setServices] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [modalVisible, setModalVisible] = useState(false);
-  const [editingService, setEditingService] = useState(null);
-  const [form] = Form.useForm();
 
   useEffect(() => {
     fetchServices();
@@ -43,55 +34,22 @@ const ServiceManager = () => {
     setLoading(true);
     try {
       const response = await api.get('/services/admin');
-      setServices(response.data);
+      setServices(response.data || []);
     } catch (error) {
-      message.error('Error fetching services');
+      console.error('Error fetching services:', error);
+      message.error('Failed to fetch services');
+      setServices([]);
     } finally {
       setLoading(false);
     }
   };
 
-  const handleSubmit = async (values) => {
-    try {
-      const formData = new FormData();
-      
-      Object.keys(values).forEach(key => {
-        if (key === 'features' || key === 'pricing') {
-          formData.append(key, JSON.stringify(values[key]));
-        } else if (values[key] !== undefined) {
-          formData.append(key, values[key]);
-        }
-      });
-
-      if (editingService) {
-        await api.put(`/services/${editingService._id}`, formData, {
-          headers: { 'Content-Type': 'multipart/form-data' }
-        });
-        message.success('Service updated successfully');
-      } else {
-        await api.post('/services', formData, {
-          headers: { 'Content-Type': 'multipart/form-data' }
-        });
-        message.success('Service created successfully');
-      }
-      
-      setModalVisible(false);
-      form.resetFields();
-      setEditingService(null);
-      fetchServices();
-    } catch (error) {
-      message.error('Error saving service');
-    }
+  const handleAdd = () => {
+    navigate('/admin/services/new');
   };
 
   const handleEdit = (service) => {
-    setEditingService(service);
-    form.setFieldsValue({
-      ...service,
-      features: service.features || [],
-      pricing: service.pricing || { basic: {}, standard: {}, premium: {} }
-    });
-    setModalVisible(true);
+    navigate(`/admin/services/${service._id}`);
   };
 
   const handleDelete = async (id) => {
@@ -100,31 +58,39 @@ const ServiceManager = () => {
       message.success('Service deleted successfully');
       fetchServices();
     } catch (error) {
-      message.error('Error deleting service');
+      message.error('Failed to delete service');
     }
   };
 
-  const toggleStatus = async (id, isActive) => {
+
+
+  const handleToggleActive = async (id, isActive) => {
     try {
       await api.put(`/services/${id}`, { isActive: !isActive });
-      message.success('Service status updated');
+      message.success(`Service ${!isActive ? 'activated' : 'deactivated'} successfully`);
       fetchServices();
     } catch (error) {
-      message.error('Error updating service status');
+      message.error('Failed to update service status');
+    }
+  };
+
+  const handleToggleFeatured = async (id, isFeatured) => {
+    try {
+      await api.put(`/services/${id}`, { isFeatured: !isFeatured });
+      message.success(`Service ${!isFeatured ? 'featured' : 'unfeatured'} successfully`);
+      fetchServices();
+    } catch (error) {
+      message.error('Failed to update service featured status');
     }
   };
 
   const columns = [
     {
-      title: 'Image',
-      dataIndex: 'image',
-      key: 'image',
-      render: (image) => image ? <Image width={50} src={image} /> : 'No image'
-    },
-    {
       title: 'Name',
       dataIndex: 'name',
       key: 'name',
+      width: '25%',
+      render: (text) => <span style={{ fontWeight: 500 }}>{text}</span>
     },
     {
       title: 'Category',
@@ -136,6 +102,7 @@ const ServiceManager = () => {
       title: 'Delivery Time',
       dataIndex: 'deliveryTime',
       key: 'deliveryTime',
+      render: (time) => <Tag color="green">{time}</Tag>
     },
     {
       title: 'Status',
@@ -144,9 +111,9 @@ const ServiceManager = () => {
       render: (isActive, record) => (
         <Switch
           checked={isActive}
-          onChange={() => toggleStatus(record._id, isActive)}
-          checkedChildren={<EyeOutlined />}
-          unCheckedChildren={<EyeInvisibleOutlined />}
+          onChange={() => handleToggleActive(record._id, isActive)}
+          checkedChildren="Active"
+          unCheckedChildren="Inactive"
         />
       )
     },
@@ -154,17 +121,31 @@ const ServiceManager = () => {
       title: 'Featured',
       dataIndex: 'isFeatured',
       key: 'isFeatured',
-      render: (isFeatured) => isFeatured ? <Tag color="gold">Featured</Tag> : null
+      render: (isFeatured, record) => (
+        <Switch
+          checked={isFeatured}
+          onChange={() => handleToggleFeatured(record._id, isFeatured)}
+          checkedChildren="Yes"
+          unCheckedChildren="No"
+        />
+      )
     },
     {
       title: 'Actions',
       key: 'actions',
       render: (_, record) => (
         <Space>
-          <Button 
-            type="primary" 
-            size="small" 
+          <Button
+            type="primary"
+            icon={<EyeOutlined />}
+            size="small"
+            onClick={() => window.open(`/services/${record.slug}`, '_blank')}
+          >
+            View
+          </Button>
+          <Button
             icon={<EditOutlined />}
+            size="small"
             onClick={() => handleEdit(record)}
           >
             Edit
@@ -175,11 +156,10 @@ const ServiceManager = () => {
             okText="Yes"
             cancelText="No"
           >
-            <Button 
-              type="primary" 
-              danger 
-              size="small" 
+            <Button
+              danger
               icon={<DeleteOutlined />}
+              size="small"
             >
               Delete
             </Button>
@@ -189,140 +169,41 @@ const ServiceManager = () => {
     }
   ];
 
-  const uploadProps = {
-    name: 'file',
-    action: 'http://localhost:5000/api/upload',
-    headers: {
-      authorization: `Bearer ${localStorage.getItem('token')}`,
-    },
-    beforeUpload: (file) => {
-      const isImage = file.type.startsWith('image/');
-      if (!isImage) {
-        message.error('You can only upload image files!');
-      }
-      return isImage;
-    },
-    onChange(info) {
-      if (info.file.status === 'done') {
-        form.setFieldsValue({ image: info.file.response.url });
-        message.success(`${info.file.name} file uploaded successfully`);
-      } else if (info.file.status === 'error') {
-        message.error(`${info.file.name} file upload failed.`);
-      }
-    },
-  };
+
 
   return (
     <div>
-      <div style={{ marginBottom: 16, display: 'flex', justifyContent: 'space-between' }}>
-        <h2>Service Management</h2>
-        <Button 
-          type="primary" 
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
+        <Title level={2}>Service Management</Title>
+        <Button
+          type="primary"
           icon={<PlusOutlined />}
-          onClick={() => {
-            setEditingService(null);
-            form.resetFields();
-            setModalVisible(true);
-          }}
+          onClick={handleAdd}
         >
-          Add Service
+          Add New Service
         </Button>
       </div>
 
-      <Table
-        columns={columns}
-        dataSource={services}
-        rowKey="_id"
-        loading={loading}
-        pagination={{ pageSize: 10 }}
-      />
+      <Card>
+        <Table
+          columns={columns}
+          dataSource={services}
+          rowKey="_id"
+          loading={loading}
+          pagination={{
+            pageSize: 10,
+            showSizeChanger: true,
+            showQuickJumper: true,
+            showTotal: (total) => `Total ${total} services`
+          }}
+        />
+      </Card>
 
-      <Modal
-        title={editingService ? 'Edit Service' : 'Add Service'}
-        open={modalVisible}
-        onCancel={() => {
-          setModalVisible(false);
-          form.resetFields();
-          setEditingService(null);
-        }}
-        footer={null}
-        width={800}
-      >
-        <Form
-          form={form}
-          layout="vertical"
-          onFinish={handleSubmit}
-        >
-          <Form.Item name="name" label="Service Name" rules={[{ required: true }]}>
-            <Input placeholder="Enter service name" />
-          </Form.Item>
 
-          <Form.Item name="shortDescription" label="Short Description">
-            <TextArea rows={2} placeholder="Brief description for cards" />
-          </Form.Item>
-
-          <Form.Item name="description" label="Full Description" rules={[{ required: true }]}>
-            <TextArea rows={4} placeholder="Enter full description" />
-          </Form.Item>
-
-          <Form.Item name="category" label="Category" rules={[{ required: true }]}>
-            <Select placeholder="Select category">
-              <Option value="web-development">Web Development</Option>
-              <Option value="mobile-development">Mobile Development</Option>
-              <Option value="digital-marketing">Digital Marketing</Option>
-              <Option value="design">Design</Option>
-              <Option value="consulting">Consulting</Option>
-            </Select>
-          </Form.Item>
-
-          <Form.Item name="deliveryTime" label="Delivery Time">
-            <Input placeholder="e.g., 2-3 weeks" />
-          </Form.Item>
-
-          <Form.Item name="features" label="Features">
-            <Select mode="tags" placeholder="Add features">
-            </Select>
-          </Form.Item>
-
-          <Form.Item name="image" label="Service Image">
-            <Space direction="vertical" style={{ width: '100%' }}>
-              <Input placeholder="Image URL" />
-              <Upload {...uploadProps}>
-                <Button icon={<UploadOutlined />}>Upload Image</Button>
-              </Upload>
-            </Space>
-          </Form.Item>
-
-          <Form.Item name="icon" label="Icon">
-            <Input placeholder="Icon name or URL" />
-          </Form.Item>
-
-          <Form.Item name="isFeatured" label="Featured Service" valuePropName="checked">
-            <Switch />
-          </Form.Item>
-
-          <Form.Item name="isActive" label="Active" valuePropName="checked" initialValue={true}>
-            <Switch />
-          </Form.Item>
-
-          <Form.Item name="order" label="Display Order">
-            <Input type="number" placeholder="0" />
-          </Form.Item>
-
-          <Form.Item>
-            <Space>
-              <Button type="primary" htmlType="submit">
-                {editingService ? 'Update' : 'Create'} Service
-              </Button>
-              <Button onClick={() => setModalVisible(false)}>
-                Cancel
-              </Button>
-            </Space>
-          </Form.Item>
-        </Form>
-      </Modal>
     </div>
   );
 };
+
+
 
 export default ServiceManager;

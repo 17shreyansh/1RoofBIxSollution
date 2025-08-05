@@ -1,75 +1,106 @@
 import React, { useState, useEffect } from 'react';
-import { Table, Button, Modal, Form, Input, Select, Switch, message, Space, Popconfirm, Tag } from 'antd';
-import { PlusOutlined, EditOutlined, DeleteOutlined, EyeOutlined, EyeInvisibleOutlined } from '@ant-design/icons';
-
+import { useNavigate } from 'react-router-dom';
+import { 
+  Table, 
+  Button, 
+  message, 
+  Space, 
+  Tag, 
+  Popconfirm,
+  Card,
+  Switch,
+  Typography,
+  Image
+} from 'antd';
+import { 
+  PlusOutlined, 
+  EditOutlined, 
+  DeleteOutlined, 
+  EyeOutlined 
+} from '@ant-design/icons';
 import api from '../../utils/api';
 
-const { Option } = Select;
-const { TextArea } = Input;
+const { Title } = Typography;
 
 const BlogManager = () => {
-  const [posts, setPosts] = useState([]);
+  const navigate = useNavigate();
+  const [blogs, setBlogs] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [modalVisible, setModalVisible] = useState(false);
-  const [editingPost, setEditingPost] = useState(null);
-  const [form] = Form.useForm();
 
   useEffect(() => {
-    fetchPosts();
+    fetchBlogs();
   }, []);
 
-  const fetchPosts = async () => {
+  const fetchBlogs = async () => {
     setLoading(true);
     try {
       const response = await api.get('/blog/admin');
-      setPosts(response.data);
+      setBlogs(response.data || []);
     } catch (error) {
-      message.error('Error fetching posts');
+      console.error('Error fetching blogs:', error);
+      message.error('Failed to fetch blogs');
+      setBlogs([]);
     } finally {
       setLoading(false);
     }
   };
 
-  const handleSubmit = async (values) => {
-    try {
-      if (editingPost) {
-        await api.put(`/blog/${editingPost._id}`, values);
-        message.success('Post updated successfully');
-      } else {
-        await api.post('/blog', values);
-        message.success('Post created successfully');
-      }
-      
-      setModalVisible(false);
-      form.resetFields();
-      setEditingPost(null);
-      fetchPosts();
-    } catch (error) {
-      message.error('Error saving post');
-    }
+  const handleAdd = () => {
+    navigate('/admin/blog/new');
   };
 
-  const handleEdit = (post) => {
-    setEditingPost(post);
-    form.setFieldsValue(post);
-    setModalVisible(true);
+  const handleEdit = (blog) => {
+    navigate(`/admin/blog/${blog._id}`);
   };
 
   const handleDelete = async (id) => {
     try {
       await api.delete(`/blog/${id}`);
-      message.success('Post deleted successfully');
-      fetchPosts();
+      message.success('Blog deleted successfully');
+      fetchBlogs();
     } catch (error) {
-      message.error('Error deleting post');
+      message.error('Failed to delete blog');
+    }
+  };
+
+  const handleTogglePublished = async (id, isPublished) => {
+    try {
+      await api.put(`/blog/${id}`, { isPublished: !isPublished });
+      message.success(`Blog ${!isPublished ? 'published' : 'unpublished'} successfully`);
+      fetchBlogs();
+    } catch (error) {
+      message.error('Failed to update blog status');
     }
   };
 
   const columns = [
     {
+      title: 'Featured Image',
+      dataIndex: 'featuredImage',
+      key: 'featuredImage',
+      width: '80px',
+      render: (image) => (
+        image ? (
+          <Image
+            width={60}
+            height={40}
+            src={image}
+            style={{ objectFit: 'cover', borderRadius: '4px' }}
+            fallback="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMIAAADDCAYAAADQvc6UAAABRWlDQ1BJQ0MgUHJvZmlsZQAAKJFjYGASSSwoyGFhYGDIzSspCnJ3UoiIjFJgf8LAwSDCIMogwMCcmFxc4BgQ4ANUwgCjUcG3awyMIPqyLsis7PPOq3QdDFcvjV3jOD1boQVTPQrgSkktTgbSf4A4LbmgqISBgTEFyFYuLykAsTuAbJEioKOA7DkgdjqEvQHEToKwj4DVhAQ5A9k3gGyB5IxEoBmML4BsnSQk8XQkNtReEOBxcfXxUQg1Mjc0dyHgXNJBSWpFCYh2zi+oLMpMzyhRcASGUqqCZ16yno6CkYGRAQMDKMwhqj/fAIcloxgHQqxAjIHBEugw5sUIsSQpBobtQPdLciLEVJYzMPBHMDBsayhILEqEO4DxG0txmrERhM29nYGBddr//5/DGRjYNRkY/l7////39v///y4Dmn+LgeHANwDrkl1AuO+pmgAAADhlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAAqACAAQAAAABAAAAwqADAAQAAAABAAAAwwAAAAD9b/HnAAAHlklEQVR4Ae3dP3Ik1RnG4W+FgYxN"
+          />
+        ) : (
+          <div style={{ width: 60, height: 40, background: '#f0f0f0', borderRadius: '4px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            No Image
+          </div>
+        )
+      )
+    },
+    {
       title: 'Title',
       dataIndex: 'title',
       key: 'title',
+      width: '30%',
+      render: (text) => <span style={{ fontWeight: 500 }}>{text}</span>
     },
     {
       title: 'Category',
@@ -78,25 +109,78 @@ const BlogManager = () => {
       render: (category) => <Tag color="blue">{category}</Tag>
     },
     {
-      title: 'Status',
+      title: 'Tags',
+      dataIndex: 'tags',
+      key: 'tags',
+      render: (tags) => {
+        if (!tags || tags.length === 0) return <span style={{ color: '#999' }}>No tags</span>;
+        
+        const tagArray = Array.isArray(tags) ? tags : [tags];
+        
+        return (
+          <div style={{ display: 'flex', flexWrap: 'wrap', gap: '4px' }}>
+            {tagArray.slice(0, 3).map((tag, index) => (
+              <Tag key={index} color="blue" style={{ margin: 0 }}>
+                {tag}
+              </Tag>
+            ))}
+            {tagArray.length > 3 && (
+              <Tag color="default" style={{ margin: 0 }}>+{tagArray.length - 3}</Tag>
+            )}
+          </div>
+        );
+      }
+    },
+    {
+      title: 'Published',
       dataIndex: 'isPublished',
       key: 'isPublished',
-      render: (isPublished) => (
-        <Tag color={isPublished ? 'green' : 'orange'}>
-          {isPublished ? 'Published' : 'Draft'}
-        </Tag>
+      render: (isPublished, record) => (
+        <Switch
+          checked={isPublished}
+          onChange={() => handleTogglePublished(record._id, isPublished)}
+          checkedChildren="Yes"
+          unCheckedChildren="No"
+        />
       )
+    },
+    {
+      title: 'Created',
+      dataIndex: 'createdAt',
+      key: 'createdAt',
+      render: (date) => new Date(date).toLocaleDateString()
     },
     {
       title: 'Actions',
       key: 'actions',
       render: (_, record) => (
         <Space>
-          <Button type="primary" size="small" icon={<EditOutlined />} onClick={() => handleEdit(record)}>
+          <Button
+            type="primary"
+            icon={<EyeOutlined />}
+            size="small"
+            onClick={() => window.open(`/blog/${record.slug}`, '_blank')}
+          >
+            View
+          </Button>
+          <Button
+            icon={<EditOutlined />}
+            size="small"
+            onClick={() => handleEdit(record)}
+          >
             Edit
           </Button>
-          <Popconfirm title="Delete this post?" onConfirm={() => handleDelete(record._id)}>
-            <Button type="primary" danger size="small" icon={<DeleteOutlined />}>
+          <Popconfirm
+            title="Are you sure you want to delete this blog?"
+            onConfirm={() => handleDelete(record._id)}
+            okText="Yes"
+            cancelText="No"
+          >
+            <Button
+              danger
+              icon={<DeleteOutlined />}
+              size="small"
+            >
               Delete
             </Button>
           </Popconfirm>
@@ -107,51 +191,31 @@ const BlogManager = () => {
 
   return (
     <div>
-      <div style={{ marginBottom: 16, display: 'flex', justifyContent: 'space-between' }}>
-        <h2>Blog Management</h2>
-        <Button type="primary" icon={<PlusOutlined />} onClick={() => { setEditingPost(null); form.resetFields(); setModalVisible(true); }}>
-          Add Post
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
+        <Title level={2}>Blog Management</Title>
+        <Button
+          type="primary"
+          icon={<PlusOutlined />}
+          onClick={handleAdd}
+        >
+          Add New Blog
         </Button>
       </div>
 
-      <Table columns={columns} dataSource={posts} rowKey="_id" loading={loading} />
-
-      <Modal
-        title={editingPost ? 'Edit Post' : 'Add Post'}
-        open={modalVisible}
-        onCancel={() => { setModalVisible(false); form.resetFields(); setEditingPost(null); }}
-        footer={null}
-        width={800}
-      >
-        <Form form={form} layout="vertical" onFinish={handleSubmit}>
-          <Form.Item name="title" label="Title" rules={[{ required: true }]}>
-            <Input />
-          </Form.Item>
-          <Form.Item name="excerpt" label="Excerpt">
-            <TextArea rows={2} />
-          </Form.Item>
-          <Form.Item name="content" label="Content" rules={[{ required: true }]}>
-            <TextArea rows={8} placeholder="Enter blog content" />
-          </Form.Item>
-          <Form.Item name="category" label="Category">
-            <Input />
-          </Form.Item>
-          <Form.Item name="tags" label="Tags">
-            <Select mode="tags" />
-          </Form.Item>
-          <Form.Item name="isPublished" label="Published" valuePropName="checked">
-            <Switch />
-          </Form.Item>
-          <Form.Item>
-            <Space>
-              <Button type="primary" htmlType="submit">
-                {editingPost ? 'Update' : 'Create'} Post
-              </Button>
-              <Button onClick={() => setModalVisible(false)}>Cancel</Button>
-            </Space>
-          </Form.Item>
-        </Form>
-      </Modal>
+      <Card>
+        <Table
+          columns={columns}
+          dataSource={blogs}
+          rowKey="_id"
+          loading={loading}
+          pagination={{
+            pageSize: 10,
+            showSizeChanger: true,
+            showQuickJumper: true,
+            showTotal: (total) => `Total ${total} blogs`
+          }}
+        />
+      </Card>
     </div>
   );
 };

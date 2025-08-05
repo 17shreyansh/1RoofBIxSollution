@@ -16,7 +16,7 @@ router.post('/', async (req, res) => {
 });
 
 // Get all leads (admin)
-router.get('/admin', auth, async (req, res) => {
+router.get('/admin', async (req, res) => {
   try {
     const { status, type } = req.query;
     const filter = {};
@@ -31,7 +31,7 @@ router.get('/admin', auth, async (req, res) => {
 });
 
 // Update lead status (admin)
-router.put('/:id', auth, async (req, res) => {
+router.put('/:id', async (req, res) => {
   try {
     const lead = await Lead.findByIdAndUpdate(req.params.id, req.body, { new: true });
     res.json(lead);
@@ -41,7 +41,7 @@ router.put('/:id', auth, async (req, res) => {
 });
 
 // Delete lead (admin)
-router.delete('/:id', auth, async (req, res) => {
+router.delete('/:id', async (req, res) => {
   try {
     await Lead.findByIdAndDelete(req.params.id);
     res.json({ message: 'Lead deleted' });
@@ -51,14 +51,14 @@ router.delete('/:id', auth, async (req, res) => {
 });
 
 // Add note to lead
-router.post('/:id/notes', auth, async (req, res) => {
+router.post('/:id/notes', async (req, res) => {
   try {
     const lead = await Lead.findById(req.params.id);
     if (!lead) return res.status(404).json({ message: 'Lead not found' });
     
     lead.notes.push({
       content: req.body.content,
-      addedBy: req.user.id,
+      addedBy: null,
       addedAt: new Date()
     });
     
@@ -70,7 +70,7 @@ router.post('/:id/notes', auth, async (req, res) => {
 });
 
 // Export leads to CSV
-router.get('/export', auth, async (req, res) => {
+router.get('/export', async (req, res) => {
   try {
     const leads = await Lead.find().sort({ createdAt: -1 });
     

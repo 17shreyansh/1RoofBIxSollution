@@ -16,10 +16,10 @@ const leadSchema = new mongoose.Schema({
   source: String,
   notes: [{
     content: String,
-    addedBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+    addedBy: String,
     addedAt: { type: Date, default: Date.now }
   }],
-  assignedTo: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+  assignedTo: String,
   lastContactedAt: Date
 }, { timestamps: true });
 

@@ -9,6 +9,7 @@ const serviceSchema = new mongoose.Schema({
   icon: String,
   image: String,
   features: [String],
+  technologies: [String],
   pricing: {
     basic: { price: Number, features: [String] },
     standard: { price: Number, features: [String] },

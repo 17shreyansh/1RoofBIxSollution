@@ -1,67 +1,85 @@
 import React, { useState, useEffect } from 'react';
-import { Table, Button, Modal, Form, Input, Select, Switch, Upload, message, Space, Popconfirm, Tag, Image } from 'antd';
-import { PlusOutlined, EditOutlined, DeleteOutlined, UploadOutlined, EyeOutlined, EyeInvisibleOutlined } from '@ant-design/icons';
-
+import { useNavigate } from 'react-router-dom';
+import { 
+  Table, 
+  Button, 
+  message, 
+  Space, 
+  Tag, 
+  Popconfirm,
+  Card,
+  Switch,
+  Typography,
+  Image
+} from 'antd';
+import { 
+  PlusOutlined, 
+  EditOutlined, 
+  DeleteOutlined, 
+  EyeOutlined 
+} from '@ant-design/icons';
 import api from '../../utils/api';
 
-const { Option } = Select;
-const { TextArea } = Input;
+const { Title } = Typography;
 
 const PortfolioManager = () => {
-  const [projects, setProjects] = useState([]);
+  const navigate = useNavigate();
+  const [portfolio, setPortfolio] = useState([]);
   const [loading, setLoading] = useState(false);
-  const [modalVisible, setModalVisible] = useState(false);
-  const [editingProject, setEditingProject] = useState(null);
-  const [form] = Form.useForm();
 
   useEffect(() => {
-    fetchProjects();
+    fetchPortfolio();
   }, []);
 
-  const fetchProjects = async () => {
+  const fetchPortfolio = async () => {
     setLoading(true);
     try {
       const response = await api.get('/portfolio/admin');
-      setProjects(response.data);
+      setPortfolio(response.data || []);
     } catch (error) {
-      message.error('Error fetching projects');
+      console.error('Error fetching portfolio:', error);
+      message.error('Failed to fetch portfolio');
+      setPortfolio([]);
     } finally {
       setLoading(false);
     }
   };
 
-  const handleSubmit = async (values) => {
-    try {
-      if (editingProject) {
-        await api.put(`/portfolio/${editingProject._id}`, values);
-        message.success('Project updated successfully');
-      } else {
-        await api.post('/portfolio', values);
-        message.success('Project created successfully');
-      }
-      
-      setModalVisible(false);
-      form.resetFields();
-      setEditingProject(null);
-      fetchProjects();
-    } catch (error) {
-      message.error('Error saving project');
-    }
+  const handleAdd = () => {
+    navigate('/admin/portfolio/new');
   };
 
   const handleEdit = (project) => {
-    setEditingProject(project);
-    form.setFieldsValue(project);
-    setModalVisible(true);
+    navigate(`/admin/portfolio/${project._id}`);
   };
 
   const handleDelete = async (id) => {
     try {
       await api.delete(`/portfolio/${id}`);
       message.success('Project deleted successfully');
-      fetchProjects();
+      fetchPortfolio();
     } catch (error) {
-      message.error('Error deleting project');
+      message.error('Failed to delete project');
+    }
+  };
+
+  const handleToggleActive = async (id, isActive) => {
+    try {
+      await api.put(`/portfolio/${id}`, { isActive: !isActive });
+      message.success(`Project ${!isActive ? 'activated' : 'deactivated'} successfully`);
+      fetchPortfolio();
+    } catch (error) {
+      message.error('Failed to update project status');
+    }
+  };
+
+  const handleToggleFeatured = async (id, isFeatured) => {
+    try {
+      await api.put(`/portfolio/${id}`, { isFeatured: !isFeatured });
+      message.success(`Project ${!isFeatured ? 'featured' : 'unfeatured'} successfully`);
+      fetchPortfolio();
+    } catch (error) {
+      message.error('Failed to update project featured status');
     }
   };
 
@@ -70,12 +88,29 @@ const PortfolioManager = () => {
       title: 'Image',
       dataIndex: 'image',
       key: 'image',
-      render: (image) => image ? <Image width={50} src={image} /> : 'No image'
+      width: '80px',
+      render: (image) => (
+        image ? (
+          <Image
+            width={60}
+            height={40}
+            src={image}
+            style={{ objectFit: 'cover', borderRadius: '4px' }}
+            fallback="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAMIAAADDCAYAAADQvc6UAAABRWlDQ1BJQ0MgUHJvZmlsZQAAKJFjYGASSSwoyGFhYGDIzSspCnJ3UoiIjFJgf8LAwSDCIMogwMCcmFxc4BgQ4ANUwgCjUcG3awyMIPqyLsis7PPOq3QdDFcvjV3jOD1boQVTPQrgSkktTgbSf4A4LbmgqISBgTEFyFYuLykAsTuAbJEioKOA7DkgdjqEvQHEToKwj4DVhAQ5A9k3gGyB5IxEoBmML4BsnSQk8XQkNtReEOBxcfXxUQg1Mjc0dyHgXNJBSWpFCYh2zi+oLMpMzyhRcASGUqqCZ16yno6CkYGRAQMDKMwhqj/fAIcloxgHQqxAjIHBEugw5sUIsSQpBobtQPdLciLEVJYzMPBHMDBsayhILEqEO4DxG0txmrERhM29nYGBddr//5/DGRjYNRkY/l7////39v///y4Dmn+LgeHANwDrkl1AuO+pmgAAADhlWElmTU0AKgAAAAgAAYdpAAQAAAABAAAAGgAAAAAAAqACAAQAAAABAAAAwqADAAQAAAABAAAAwwAAAAD9b/HnAAAHlklEQVR4Ae3dP3Ik1RnG4W+FgYxN"
+          />
+        ) : (
+          <div style={{ width: 60, height: 40, background: '#f0f0f0', borderRadius: '4px', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            No Image
+          </div>
+        )
+      )
     },
     {
       title: 'Title',
       dataIndex: 'title',
       key: 'title',
+      width: '20%',
+      render: (text) => <span style={{ fontWeight: 500 }}>{text}</span>
     },
     {
       title: 'Category',
@@ -87,16 +122,31 @@ const PortfolioManager = () => {
       title: 'Client',
       dataIndex: ['client', 'name'],
       key: 'client',
+      render: (clientName) => clientName || 'N/A'
     },
     {
       title: 'Status',
       dataIndex: 'isActive',
       key: 'isActive',
-      render: (isActive) => (
+      render: (isActive, record) => (
         <Switch
           checked={isActive}
-          checkedChildren={<EyeOutlined />}
-          unCheckedChildren={<EyeInvisibleOutlined />}
+          onChange={() => handleToggleActive(record._id, isActive)}
+          checkedChildren="Active"
+          unCheckedChildren="Inactive"
+        />
+      )
+    },
+    {
+      title: 'Featured',
+      dataIndex: 'isFeatured',
+      key: 'isFeatured',
+      render: (isFeatured, record) => (
+        <Switch
+          checked={isFeatured}
+          onChange={() => handleToggleFeatured(record._id, isFeatured)}
+          checkedChildren="Yes"
+          unCheckedChildren="No"
         />
       )
     },
@@ -105,11 +155,32 @@ const PortfolioManager = () => {
       key: 'actions',
       render: (_, record) => (
         <Space>
-          <Button type="primary" size="small" icon={<EditOutlined />} onClick={() => handleEdit(record)}>
+          <Button
+            type="primary"
+            icon={<EyeOutlined />}
+            size="small"
+            onClick={() => window.open(`/portfolio/${record.slug}`, '_blank')}
+          >
+            View
+          </Button>
+          <Button
+            icon={<EditOutlined />}
+            size="small"
+            onClick={() => handleEdit(record)}
+          >
             Edit
           </Button>
-          <Popconfirm title="Delete this project?" onConfirm={() => handleDelete(record._id)}>
-            <Button type="primary" danger size="small" icon={<DeleteOutlined />}>
+          <Popconfirm
+            title="Are you sure you want to delete this project?"
+            onConfirm={() => handleDelete(record._id)}
+            okText="Yes"
+            cancelText="No"
+          >
+            <Button
+              danger
+              icon={<DeleteOutlined />}
+              size="small"
+            >
               Delete
             </Button>
           </Popconfirm>
@@ -120,55 +191,31 @@ const PortfolioManager = () => {
 
   return (
     <div>
-      <div style={{ marginBottom: 16, display: 'flex', justifyContent: 'space-between' }}>
-        <h2>Portfolio Management</h2>
-        <Button type="primary" icon={<PlusOutlined />} onClick={() => { setEditingProject(null); form.resetFields(); setModalVisible(true); }}>
-          Add Project
+      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 24 }}>
+        <Title level={2}>Portfolio Management</Title>
+        <Button
+          type="primary"
+          icon={<PlusOutlined />}
+          onClick={handleAdd}
+        >
+          Add New Project
         </Button>
       </div>
 
-      <Table columns={columns} dataSource={projects} rowKey="_id" loading={loading} />
-
-      <Modal
-        title={editingProject ? 'Edit Project' : 'Add Project'}
-        open={modalVisible}
-        onCancel={() => { setModalVisible(false); form.resetFields(); setEditingProject(null); }}
-        footer={null}
-        width={800}
-      >
-        <Form form={form} layout="vertical" onFinish={handleSubmit}>
-          <Form.Item name="title" label="Project Title" rules={[{ required: true }]}>
-            <Input />
-          </Form.Item>
-          <Form.Item name="shortDescription" label="Short Description">
-            <TextArea rows={2} />
-          </Form.Item>
-          <Form.Item name="description" label="Full Description">
-            <TextArea rows={4} placeholder="Enter full description" />
-          </Form.Item>
-          <Form.Item name="category" label="Category">
-            <Select>
-              <Option value="web-development">Web Development</Option>
-              <Option value="mobile-development">Mobile Development</Option>
-              <Option value="design">Design</Option>
-            </Select>
-          </Form.Item>
-          <Form.Item name={['client', 'name']} label="Client Name">
-            <Input />
-          </Form.Item>
-          <Form.Item name="isActive" label="Active" valuePropName="checked" initialValue={true}>
-            <Switch />
-          </Form.Item>
-          <Form.Item>
-            <Space>
-              <Button type="primary" htmlType="submit">
-                {editingProject ? 'Update' : 'Create'} Project
-              </Button>
-              <Button onClick={() => setModalVisible(false)}>Cancel</Button>
-            </Space>
-          </Form.Item>
-        </Form>
-      </Modal>
+      <Card>
+        <Table
+          columns={columns}
+          dataSource={portfolio}
+          rowKey="_id"
+          loading={loading}
+          pagination={{
+            pageSize: 10,
+            showSizeChanger: true,
+            showQuickJumper: true,
+            showTotal: (total) => `Total ${total} projects`
+          }}
+        />
+      </Card>
     </div>
   );
 };
