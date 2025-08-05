@@ -1,0 +1,17 @@
+/* Loading spinner */
+.loading {
+  @apply flex justify-center items-center min-h-[200px];
+}
+
+.spinner {
+  @apply w-10 h-10 border-4 border-gray-200 border-t-primary-600 rounded-full animate-spin;
+}
+
+/* Error and success messages */
+.error {
+  @apply bg-red-50 text-red-600 p-4 rounded-lg my-4 text-center border border-red-200;
+}
+
+.success {
+  @apply bg-green-50 text-green-600 p-4 rounded-lg my-4 text-center border border-green-200;
+}
