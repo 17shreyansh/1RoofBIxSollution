@@ -2,171 +2,307 @@ const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 require('dotenv').config();
 
+// Import all models
 const User = require('./models/User');
 const Service = require('./models/Service');
 const Portfolio = require('./models/Portfolio');
+const Blog = require('./models/Blog');
+const Product = require('./models/Product');
 const Testimonial = require('./models/Testimonial');
+const PricingPlan = require('./models/PricingPlan');
+const Partner = require('./models/Partner');
+const Content = require('./models/Content');
 const Page = require('./models/Page');
 
-const seedData = async () => {
+const seedAll = async () => {
   try {
     await mongoose.connect(process.env.MONGODB_URI);
-    console.log('Connected to MongoDB');
+    console.log('🔗 Connected to MongoDB');
 
-    // Clear existing data
-    await User.deleteMany({});
-    await Service.deleteMany({});
-    await Portfolio.deleteMany({});
-    await Testimonial.deleteMany({});
-    await Page.deleteMany({});
+    // Clear all existing data
+    console.log('🧹 Clearing existing data...');
+    await Promise.all([
+      User.deleteMany({}),
+      Service.deleteMany({}),
+      Portfolio.deleteMany({}),
+      Blog.deleteMany({}),
+      Product.deleteMany({}),
+      Testimonial.deleteMany({}),
+      PricingPlan.deleteMany({}),
+      Partner.deleteMany({}),
+      Content.deleteMany({}),
+      Page.deleteMany({})
+    ]);
+    console.log('✅ Existing data cleared');
 
     // Create admin user
+    console.log('👤 Creating admin user...');
     const adminUser = new User({
+      name: 'Admin User',
       email: 'admin@roofbizsolutions.com',
       password: 'admin123',
-      role: 'admin'
+      role: 'super_admin'
     });
     await adminUser.save();
-    console.log('Admin user created');
+    console.log('✅ Admin user created');
 
-    // Create services
+    // Seed Services
+    console.log('🛠️ Seeding services...');
     const services = [
       {
         name: 'Web Development',
-        slug: 'web-development',
-        description: 'Custom websites built with modern technologies',
+        description: 'Transform your digital presence with cutting-edge web development solutions.',
+        shortDescription: 'Custom websites and web applications built with modern technologies',
         category: 'Development',
-        pricing: {
-          basic: { price: 999, features: ['Responsive Design', 'SEO Optimized', '3 Pages'] },
-          standard: { price: 2999, features: ['Custom Design', 'CMS Integration', '10 Pages', 'Contact Forms'] },
-          premium: { price: 5999, features: ['E-commerce Ready', 'Advanced Features', 'Unlimited Pages', 'Priority Support'] }
-        },
         deliveryTime: '2-4 weeks',
+        features: ['Responsive Design', 'Modern Frameworks', 'SEO Optimized', 'Fast Loading'],
+        technologies: ['React.js', 'Node.js', 'MongoDB', 'Express.js'],
+        pricing: {
+          basic: { price: 29999, features: ['Up to 5 pages', 'Responsive design', 'Basic SEO'] },
+          standard: { price: 49999, features: ['Up to 10 pages', 'Advanced features', 'Complete SEO'] },
+          premium: { price: 79999, features: ['Unlimited pages', 'Custom functionality', 'E-commerce'] }
+        },
         isActive: true,
+        isFeatured: true,
         order: 1
       },
       {
-        name: 'App Development',
-        slug: 'app-development',
-        description: 'Native and cross-platform mobile applications',
+        name: 'Mobile App Development',
+        description: 'Native and cross-platform mobile applications that deliver exceptional user experiences.',
+        shortDescription: 'iOS and Android mobile applications',
         category: 'Development',
+        deliveryTime: '6-8 weeks',
+        features: ['Cross Platform', 'Native Performance', 'App Store Ready', 'Push Notifications'],
+        technologies: ['React Native', 'Flutter', 'Swift', 'Kotlin'],
         pricing: {
-          basic: { price: 4999, features: ['iOS or Android', 'Basic Features', 'App Store Submission'] },
-          standard: { price: 9999, features: ['iOS + Android', 'Advanced Features', 'Backend Integration'] },
-          premium: { price: 19999, features: ['Custom Features', 'Real-time Updates', 'Analytics Integration'] }
+          basic: { price: 50000, features: ['Basic App', 'iOS or Android', '5 Screens'] },
+          standard: { price: 80000, features: ['Both Platforms', '10 Screens', 'API Integration'] },
+          premium: { price: 120000, features: ['Advanced Features', 'Backend', 'Admin Panel'] }
         },
-        deliveryTime: '6-12 weeks',
         isActive: true,
+        isFeatured: true,
         order: 2
       },
       {
         name: 'Digital Marketing',
-        slug: 'digital-marketing',
-        description: 'Comprehensive digital marketing strategies',
+        description: 'Boost your online presence with comprehensive digital marketing strategies.',
+        shortDescription: 'SEO, PPC, social media, and content marketing services',
         category: 'Marketing',
-        pricing: {
-          basic: { price: 1499, features: ['Social Media Management', 'Content Creation', 'Monthly Reports'] },
-          standard: { price: 2999, features: ['PPC Campaigns', 'Email Marketing', 'SEO Optimization'] },
-          premium: { price: 4999, features: ['Full Marketing Suite', 'Advanced Analytics', 'Dedicated Manager'] }
-        },
         deliveryTime: 'Ongoing',
+        features: ['SEO Optimization', 'PPC Campaigns', 'Social Media', 'Analytics'],
+        technologies: ['Google Ads', 'Facebook Ads', 'Google Analytics', 'SEMrush'],
+        pricing: {
+          basic: { price: 14999, features: ['Basic SEO', 'Social media setup', 'Monthly reporting'] },
+          standard: { price: 29999, features: ['Complete SEO', 'PPC management', 'Weekly reporting'] },
+          premium: { price: 49999, features: ['Full strategy', 'Multi-platform', 'Daily monitoring'] }
+        },
         isActive: true,
+        isFeatured: true,
         order: 3
       }
     ];
-
     await Service.insertMany(services);
-    console.log('Services created');
+    console.log('✅ Services seeded');
 
-    // Create portfolio items
-    const portfolio = [
+    // Seed Portfolio
+    console.log('💼 Seeding portfolio...');
+    const portfolioItems = [
       {
         title: 'E-commerce Platform',
-        slug: 'ecommerce-platform',
-        description: 'Modern e-commerce solution with advanced features',
-        category: 'E-commerce',
-        services: ['Web Development', 'Digital Marketing'],
-        client: 'TechStore Inc.',
-        technologies: ['React', 'Node.js', 'MongoDB'],
-        isActive: true
+        description: 'A comprehensive e-commerce solution built for a growing retail business.',
+        shortDescription: 'Modern online store with advanced features',
+        category: 'Web Development',
+        services: ['Web Development', 'E-commerce', 'UI/UX Design'],
+        client: {
+          name: 'RetailMax Solutions',
+          website: 'https://retailmax.com'
+        },
+        projectUrl: 'https://demo-ecommerce.com',
+        technologies: ['React.js', 'Node.js', 'MongoDB', 'Stripe', 'AWS'],
+        results: {
+          metrics: [
+            { label: 'Sales Increase', value: '250%', improvement: '+150%' },
+            { label: 'Page Load Speed', value: '1.2s', improvement: '60% faster' }
+          ]
+        },
+        isActive: true,
+        isFeatured: true,
+        order: 1
       },
       {
         title: 'Mobile Banking App',
-        slug: 'mobile-banking-app',
-        description: 'Secure mobile banking application',
-        category: 'Mobile App',
-        services: ['App Development'],
-        client: 'SecureBank',
+        description: 'Secure mobile banking application with advanced security features.',
+        shortDescription: 'iOS and Android banking app',
+        category: 'Mobile Development',
+        services: ['Mobile Development', 'Security'],
+        client: {
+          name: 'SecureBank',
+          website: 'https://securebank.com'
+        },
         technologies: ['React Native', 'Node.js', 'PostgreSQL'],
-        isActive: true
+        results: {
+          metrics: [
+            { label: 'User Adoption', value: '85%', improvement: '+85%' },
+            { label: 'Transaction Speed', value: '3s', improvement: '70% faster' }
+          ]
+        },
+        isActive: true,
+        isFeatured: true,
+        order: 2
       }
     ];
+    await Portfolio.insertMany(portfolioItems);
+    console.log('✅ Portfolio seeded');
 
-    await Portfolio.insertMany(portfolio);
-    console.log('Portfolio items created');
+    // Seed Content
+    console.log('📝 Seeding content...');
+    const defaultContent = {
+      home: {
+        heroMainTitle: 'Transform Your Business with',
+        heroHighlightTitle: 'Digital Excellence',
+        heroSubtitle: 'We help businesses grow through innovative web development, digital marketing, and strategic consulting solutions that deliver measurable results.',
+        heroBadgeText: 'Trusted by 500+ Businesses Worldwide',
+        heroBenefit1: 'Custom Web Development & Design',
+        heroBenefit2: 'Data-Driven Digital Marketing',
+        heroBenefit3: 'Strategic Business Consulting',
+        heroCTAButton: 'Get Started Today',
+        heroSecondaryButton: 'Watch Demo',
+        stat1Number: '500+',
+        stat1Label: 'Happy Clients',
+        stat2Number: '1000+',
+        stat2Label: 'Projects Completed',
+        stat3Number: '10+',
+        stat3Label: 'Years Experience',
+        stat4Number: '99%',
+        stat4Label: 'Client Satisfaction'
+      },
+      about: {
+        heroTitle: 'About Roof Biz Solutions',
+        heroBadgeText: 'Trusted Digital Partner Since 2014',
+        heroSubtitle: 'We\'re a team of passionate professionals dedicated to transforming businesses through innovative digital solutions that drive real results.'
+      },
+      contact: {
+        heroTitle: 'Get In Touch',
+        heroBadgeText: 'Let\'s Start a Conversation',
+        heroSubtitle: 'Ready to transform your business? Let\'s discuss your project and create something amazing together.',
+        email: 'info@roofbizsolutions.com',
+        phone: '+1 (234) 567-890',
+        address: '123 Business St, City, State 12345'
+      }
+    };
 
-    // Create testimonials
+    for (const [section, content] of Object.entries(defaultContent)) {
+      await Content.create({ section, content });
+    }
+    console.log('✅ Content seeded');
+
+    // Seed Testimonials
+    console.log('💬 Seeding testimonials...');
     const testimonials = [
       {
         name: 'John Smith',
-        company: 'TechCorp',
-        position: 'CEO',
-        content: 'Roof Biz Solutions transformed our digital presence. Highly recommended!',
+        role: 'CEO, TechCorp',
+        content: 'Roof Biz Solutions delivered an exceptional website that exceeded our expectations.',
         rating: 5,
-        isActive: true
+        isActive: true,
+        order: 1
       },
       {
         name: 'Sarah Johnson',
-        company: 'StartupXYZ',
-        position: 'Founder',
-        content: 'Professional team with excellent results. They delivered beyond expectations.',
+        role: 'Marketing Director, StartupXYZ',
+        content: 'Their digital marketing expertise helped us increase our online presence significantly.',
         rating: 5,
-        isActive: true
+        isActive: true,
+        order: 2
       }
     ];
-
     await Testimonial.insertMany(testimonials);
-    console.log('Testimonials created');
+    console.log('✅ Testimonials seeded');
 
-    // Create home page
-    const homePage = new Page({
-      slug: 'home',
-      title: 'Home - Roof Biz Solutions',
-      content: {
-        hero: {
-          title: 'One Partner. All Solutions.',
-          subtitle: 'We Turn Ideas Into Brands. Brands Into Businesses.',
-          ctaButtons: [
-            { text: 'Book a Free Strategy Call', link: '/contact', type: 'primary' },
-            { text: 'Explore Services', link: '/services', type: 'secondary' }
-          ]
-        },
-        sections: [
-          {
-            type: 'about',
-            title: 'Why Choose Us',
-            content: 'We are your strategic partner in digital transformation.',
-            order: 1
-          }
-        ]
+    // Seed Blog Posts
+    console.log('📰 Seeding blog posts...');
+    const blogPosts = [
+      {
+        title: 'The Future of Web Development',
+        content: '<p>Web development is evolving rapidly with new technologies and frameworks emerging constantly. In this post, we explore the latest trends shaping the future of web development.</p>',
+        excerpt: 'Exploring the latest trends in web development',
+        category: 'Technology',
+        tags: ['Web Development', 'Technology', 'Trends'],
+        author: adminUser._id,
+        isPublished: true,
+        publishedAt: new Date(),
+        seo: {
+          metaTitle: 'The Future of Web Development - Roof Biz Solutions',
+          metaDescription: 'Discover the latest trends and technologies shaping the future of web development.',
+          keywords: ['web development', 'technology', 'trends', 'future']
+        }
+      }
+    ];
+    await Blog.insertMany(blogPosts);
+    console.log('✅ Blog posts seeded');
+
+    // Seed Products
+    console.log('🛍️ Seeding products...');
+    const products = [
+      {
+        name: 'Website Template',
+        description: 'Professional website template for businesses',
+        type: 'digital',
+        price: 99,
+        category: 'Templates',
+        isActive: true,
+        isFeatured: true
+      }
+    ];
+    await Product.insertMany(products);
+    console.log('✅ Products seeded');
+
+    // Seed Pricing Plans
+    console.log('💰 Seeding pricing plans...');
+    const pricingPlans = [
+      {
+        name: 'Starter Website',
+        price: 1500,
+        features: ['5 Pages', 'Responsive Design', 'Basic SEO', 'Contact Form'],
+        deliveryTime: '2 weeks',
+        serviceCategory: 'web-development',
+        isActive: true,
+        order: 1
       },
-      seo: {
-        metaTitle: 'Roof Biz Solutions - Digital Agency',
-        metaDescription: 'Professional digital solutions for your business growth',
-        keywords: ['web development', 'digital marketing', 'app development']
-      },
-      isActive: true
-    });
+      {
+        name: 'Business Website',
+        price: 3000,
+        features: ['10 Pages', 'CMS Integration', 'Advanced SEO', 'Analytics'],
+        deliveryTime: '3 weeks',
+        serviceCategory: 'web-development',
+        isPopular: true,
+        isActive: true,
+        order: 2
+      }
+    ];
+    await PricingPlan.insertMany(pricingPlans);
+    console.log('✅ Pricing plans seeded');
 
-    await homePage.save();
-    console.log('Home page created');
+    // Seed Partners
+    console.log('🤝 Seeding partners...');
+    const partners = [
+      {
+        name: 'Google Partner',
+        logo: '/images/google-partner.png',
+        type: 'certification',
+        isActive: true,
+        order: 1
+      }
+    ];
+    await Partner.insertMany(partners);
+    console.log('✅ Partners seeded');
 
-    console.log('Database seeded successfully!');
+    console.log('🎉 All data seeded successfully!');
     process.exit(0);
   } catch (error) {
-    console.error('Error seeding database:', error);
+    console.error('❌ Error seeding database:', error);
     process.exit(1);
   }
 };
 
-seedData();
+seedAll();

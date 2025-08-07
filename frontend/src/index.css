@@ -1,75 +1,9 @@
 @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Poppins:wght@300;400;500;600;700;800;900&display=swap');
 
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
 body {
   font-family: 'Inter', sans-serif;
-  margin: 0;
-  padding: 0;
-  line-height: 1.6;
-}
-
-* {
-  box-sizing: border-box;
-}
-
-@keyframes ping {
-  75%, 100% {
-    transform: scale(2);
-    opacity: 0;
-  }
-}
-
-@keyframes fadeInUp {
-  from {
-    opacity: 0;
-    transform: translateY(30px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-.hover-overlay:hover {
-  opacity: 1 !important;
-}
-
-.portfolio-overlay:hover {
-  opacity: 1 !important;
-}
-
-/* Smooth scrolling */
-html {
-  scroll-behavior: smooth;
-}
-
-/* Custom scrollbar */
-::-webkit-scrollbar {
-  width: 8px;
-}
-
-::-webkit-scrollbar-track {
-  background: #f1f5f9;
-}
-
-::-webkit-scrollbar-thumb {
-  background: linear-gradient(135deg, #3b82f6, #8b5cf6);
-  border-radius: 4px;
-}
-
-::-webkit-scrollbar-thumb:hover {
-  background: linear-gradient(135deg, #2563eb, #7c3aed);
-}
-
-/* Focus styles for accessibility */
-.btn:focus,
-button:focus {
-  outline: 2px solid #3b82f6;
-  outline-offset: 2px;
-}
-
-/* Improved text rendering */
-body {
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-rendering: optimizeLegibility;
 }
