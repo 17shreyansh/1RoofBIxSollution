@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
 import { Menu, X, Phone, Mail, ArrowRight, Globe, Code, Users, User, LogOut, ShoppingBag, ChevronDown } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Navbar, Nav, Container, Button, Dropdown } from 'react-bootstrap';
+import { Container, Button, Dropdown } from 'react-bootstrap';
 import { useAuth } from '../../context/AuthContext';
 import logo from '../../assets/logo.png';
 
@@ -169,51 +169,266 @@ const Header = () => {
       </div>}
 
       {/* Main Navigation */}
-      <Navbar expand="lg" style={{ padding: 'clamp(0.75rem, 2vw, 1.25rem) 0' }}>
+      <nav style={{ padding: 'clamp(0.75rem, 2vw, 1.25rem) 0' }}>
         <Container>
-          <motion.div
-            initial={{ opacity: 0, scale: 0.8 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ delay: 0.4 }}
-          >
-            <Navbar.Brand 
-              as={Link} 
-              to="/" 
-              style={{ textDecoration: 'none', transition: 'all 0.3s ease' }}
-              onMouseEnter={(e) => {
-                e.target.style.transform = 'scale(1.05)';
-              }}
-              onMouseLeave={(e) => {
-                e.target.style.transform = 'scale(1)';
-              }}
+          <div className="d-flex justify-content-between align-items-center w-100">
+            <motion.div
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ delay: 0.4 }}
             >
-              <img 
-                src={logo} 
-                alt="1roofBizSolution" 
-                style={{
-                  height: 'clamp(40px, 5vw, 50px)',
-                  width: 'auto',
-                  objectFit: 'contain',
-                  mixBlendMode: 'multiply',
-
+              <Link 
+                to="/" 
+                style={{ textDecoration: 'none', transition: 'all 0.3s ease' }}
+                onMouseEnter={(e) => {
+                  e.target.style.transform = 'scale(1.05)';
                 }}
-              />
-            </Navbar.Brand>
-          </motion.div>
+                onMouseLeave={(e) => {
+                  e.target.style.transform = 'scale(1)';
+                }}
+              >
+                <img 
+                  src={logo} 
+                  alt="1roofBizSolution" 
+                  style={{
+                    height: 'clamp(40px, 5vw, 50px)',
+                    width: 'auto',
+                    objectFit: 'contain',
+                    mixBlendMode: 'multiply'
+                  }}
+                />
+              </Link>
+            </motion.div>
 
-          {/* Mobile Menu Toggle */}
-          <motion.div
-            whileTap={{ scale: 0.95 }}
-          >
-            <Navbar.Toggle 
-              aria-controls="basic-navbar-nav"
+            {/* Desktop Navigation */}
+            <div className="d-none d-lg-flex align-items-center">
+            {navItems.map((item, index) => {
+              const isActive = isActiveLink(item.path);
+              return (
+                <motion.div
+                  key={item.path}
+                  initial={{ opacity: 0, y: -20 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ delay: 0.5 + index * 0.1 }}
+                >
+                  <Link 
+                    to={item.path} 
+                    style={getNavLinkStyle(isActive)}
+                    onMouseEnter={(e) => {
+                      if (!isActive) {
+                        e.target.style.backgroundColor = 'rgba(59, 130, 246, 0.05)';
+                        e.target.style.color = '#3b82f6';
+                        e.target.style.transform = 'translateY(-2px)';
+                      }
+                    }}
+                    onMouseLeave={(e) => {
+                      if (!isActive) {
+                        e.target.style.backgroundColor = 'transparent';
+                        e.target.style.color = '#374151';
+                        e.target.style.transform = 'translateY(0)';
+                      }
+                    }}
+                  >
+                    {item.label}
+                    {isActive && (
+                      <motion.div
+                        style={{
+                          position: 'absolute',
+                          bottom: '0.25rem',
+                          left: '50%',
+                          width: '6px',
+                          height: '6px',
+                          background: '#3b82f6',
+                          borderRadius: '50%',
+                          transform: 'translateX(-50%)'
+                        }}
+                        layoutId="activeIndicator"
+                        transition={{ type: "spring", stiffness: 300, damping: 30 }}
+                      />
+                    )}
+                  </Link>
+                </motion.div>
+              );
+            })}
+            
+            {/* Desktop User Menu */}
+            {customer ? (
+              <motion.div
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ delay: 0.7 }}
+                style={{ marginLeft: '0.5rem' }}
+              >
+                <Dropdown align="end">
+                  <Dropdown.Toggle
+                    variant="light"
+                    style={{
+                      background: 'rgba(59, 130, 246, 0.1)',
+                      border: '2px solid rgba(59, 130, 246, 0.2)',
+                      borderRadius: '50px',
+                      padding: '0.75rem 1.5rem',
+                      fontWeight: '600',
+                      fontSize: '0.95rem',
+                      color: '#3b82f6',
+                      display: 'flex',
+                      alignItems: 'center',
+                      gap: '0.5rem'
+                    }}
+                  >
+                    <User size={16} />
+                    {customer.name || customer.email.split('@')[0]}
+                  </Dropdown.Toggle>
+
+                  <Dropdown.Menu
+                    style={{
+                      borderRadius: '12px',
+                      border: 'none',
+                      boxShadow: '0 10px 40px rgba(0, 0, 0, 0.15)',
+                      padding: '0.5rem'
+                    }}
+                  >
+                    <Dropdown.Item
+                      as={Link}
+                      to="/my-orders"
+                      style={{
+                        borderRadius: '8px',
+                        padding: '0.75rem 1rem',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '0.5rem',
+                        color: '#374151',
+                        textDecoration: 'none'
+                      }}
+                    >
+                      <ShoppingBag size={16} />
+                      My Orders
+                    </Dropdown.Item>
+                    <Dropdown.Divider />
+                    <Dropdown.Item
+                      onClick={logout}
+                      style={{
+                        borderRadius: '8px',
+                        padding: '0.75rem 1rem',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '0.5rem',
+                        color: '#ef4444'
+                      }}
+                    >
+                      <LogOut size={16} />
+                      Logout
+                    </Dropdown.Item>
+                  </Dropdown.Menu>
+                </Dropdown>
+              </motion.div>
+            ) : (
+              <>
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.8 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ delay: 0.7 }}
+                  style={{ marginLeft: '0.5rem' }}
+                >
+                  <Link
+                    to="/login"
+                    style={{
+                      color: '#6b7280',
+                      fontWeight: '600',
+                      textDecoration: 'none',
+                      padding: '0.75rem 1rem',
+                      borderRadius: '12px',
+                      transition: 'all 0.3s ease'
+                    }}
+                    onMouseEnter={(e) => {
+                      e.target.style.backgroundColor = 'rgba(107, 114, 128, 0.1)';
+                      e.target.style.color = '#374151';
+                    }}
+                    onMouseLeave={(e) => {
+                      e.target.style.backgroundColor = 'transparent';
+                      e.target.style.color = '#6b7280';
+                    }}
+                  >
+                    Login
+                  </Link>
+                </motion.div>
+                
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.8 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ delay: 0.75 }}
+                  style={{ marginLeft: '0.5rem' }}
+                >
+                  <Button
+                    as={Link}
+                    to="/signup"
+                    variant="outline-primary"
+                    style={{
+                      borderRadius: '50px',
+                      padding: '0.75rem 1.5rem',
+                      fontWeight: '600',
+                      fontSize: '0.95rem',
+                      transition: 'all 0.3s ease',
+                      textDecoration: 'none'
+                    }}
+                  >
+                    Sign Up
+                  </Button>
+                </motion.div>
+              </>
+            )}
+            
+            {/* Desktop CTA Button */}
+            <motion.div
+              initial={{ opacity: 0, scale: 0.8 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ delay: 0.8 }}
+              style={{ marginLeft: '0.5rem' }}
+            >
+              <Button
+                as={Link}
+                to="/contact"
+                style={{
+                  background: 'linear-gradient(135deg, #3b82f6, #2563eb)',
+                  border: 'none',
+                  borderRadius: '50px',
+                  padding: '0.75rem 1.5rem',
+                  fontWeight: '600',
+                  fontSize: '0.95rem',
+                  boxShadow: '0 4px 15px rgba(59, 130, 246, 0.3)',
+                  transition: 'all 0.3s ease',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '0.5rem'
+                }}
+                onMouseEnter={(e) => {
+                  e.target.style.transform = 'translateY(-2px)';
+                  e.target.style.boxShadow = '0 8px 25px rgba(59, 130, 246, 0.4)';
+                  e.target.style.background = 'linear-gradient(135deg, #2563eb, #1d4ed8)';
+                }}
+                onMouseLeave={(e) => {
+                  e.target.style.transform = 'translateY(0)';
+                  e.target.style.boxShadow = '0 4px 15px rgba(59, 130, 246, 0.3)';
+                  e.target.style.background = 'linear-gradient(135deg, #3b82f6, #2563eb)';
+                }}
+              >
+                Get Quote
+                <ArrowRight size={16} />
+              </Button>
+            </motion.div>
+            </div>
+
+            {/* Mobile Menu Toggle */}
+            <motion.button
+              className="d-lg-none"
+              whileTap={{ scale: 0.95 }}
               onClick={() => setIsMenuOpen(!isMenuOpen)}
               style={{
                 border: 'none',
-                padding: '0.5rem',
+                padding: '0.75rem',
                 background: isMenuOpen ? 'rgba(59, 130, 246, 0.1)' : 'transparent',
                 borderRadius: '12px',
-                transition: 'all 0.3s ease'
+                transition: 'all 0.3s ease',
+                cursor: 'pointer'
               }}
             >
               <motion.div
@@ -226,254 +441,54 @@ const Header = () => {
                   <Menu size={24} style={{ color: '#374151' }} />
                 )}
               </motion.div>
-            </Navbar.Toggle>
-          </motion.div>
-
-          <Navbar.Collapse id="basic-navbar-nav">
-            <Nav className="ms-auto align-items-center">
-              {navItems.map((item, index) => {
-                const isActive = isActiveLink(item.path);
-                return (
-                  <motion.div
-                    key={item.path}
-                    initial={{ opacity: 0, y: -20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ delay: 0.5 + index * 0.1 }}
-                  >
-                    <Nav.Link 
-                      as={Link} 
-                      to={item.path} 
-                      style={getNavLinkStyle(isActive)}
-                      onMouseEnter={(e) => {
-                        if (!isActive) {
-                          e.target.style.backgroundColor = 'rgba(59, 130, 246, 0.05)';
-                          e.target.style.color = '#3b82f6';
-                          e.target.style.transform = 'translateY(-2px)';
-                        }
-                      }}
-                      onMouseLeave={(e) => {
-                        if (!isActive) {
-                          e.target.style.backgroundColor = 'transparent';
-                          e.target.style.color = '#374151';
-                          e.target.style.transform = 'translateY(0)';
-                        }
-                      }}
-                    >
-                      {item.label}
-                      {isActive && (
-                        <motion.div
-                          style={{
-                            position: 'absolute',
-                            bottom: '0.25rem',
-                            left: '50%',
-                            width: '6px',
-                            height: '6px',
-                            background: '#3b82f6',
-                            borderRadius: '50%',
-                            transform: 'translateX(-50%)'
-                          }}
-                          layoutId="activeIndicator"
-                          transition={{ type: "spring", stiffness: 300, damping: 30 }}
-                        />
-                      )}
-                    </Nav.Link>
-                  </motion.div>
-                );
-              })}
-              
-              {/* User Menu or Auth Links */}
-              {customer ? (
-                <motion.div
-                  initial={{ opacity: 0, scale: 0.8 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  transition={{ delay: 0.7 }}
-                  style={{ marginLeft: '0.5rem' }}
-                >
-                  <Dropdown align="end">
-                    <Dropdown.Toggle
-                      variant="light"
-                      style={{
-                        background: 'rgba(59, 130, 246, 0.1)',
-                        border: '2px solid rgba(59, 130, 246, 0.2)',
-                        borderRadius: '50px',
-                        padding: 'clamp(0.5rem, 1.5vw, 0.75rem) clamp(1rem, 2.5vw, 1.5rem)',
-                        fontWeight: '600',
-                        fontSize: 'clamp(0.85rem, 1.8vw, 0.95rem)',
-                        color: '#3b82f6',
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '0.5rem'
-                      }}
-                    >
-                      <User size={16} />
-                      {customer.name || customer.email.split('@')[0]}
-                    </Dropdown.Toggle>
-
-                    <Dropdown.Menu
-                      style={{
-                        borderRadius: '12px',
-                        border: 'none',
-                        boxShadow: '0 10px 40px rgba(0, 0, 0, 0.15)',
-                        padding: '0.5rem'
-                      }}
-                    >
-                      <Dropdown.Item
-                        as={Link}
-                        to="/my-orders"
-                        style={{
-                          borderRadius: '8px',
-                          padding: '0.75rem 1rem',
-                          display: 'flex',
-                          alignItems: 'center',
-                          gap: '0.5rem',
-                          color: '#374151',
-                          textDecoration: 'none'
-                        }}
-                      >
-                        <ShoppingBag size={16} />
-                        My Orders
-                      </Dropdown.Item>
-                      <Dropdown.Divider />
-                      <Dropdown.Item
-                        onClick={logout}
-                        style={{
-                          borderRadius: '8px',
-                          padding: '0.75rem 1rem',
-                          display: 'flex',
-                          alignItems: 'center',
-                          gap: '0.5rem',
-                          color: '#ef4444'
-                        }}
-                      >
-                        <LogOut size={16} />
-                        Logout
-                      </Dropdown.Item>
-                    </Dropdown.Menu>
-                  </Dropdown>
-                </motion.div>
-              ) : (
-                <>
-                  <motion.div
-                    initial={{ opacity: 0, scale: 0.8 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    transition={{ delay: 0.7 }}
-                    style={{ marginLeft: '0.5rem' }}
-                  >
-                    <Nav.Link
-                      as={Link}
-                      to="/login"
-                      style={{
-                        color: '#6b7280',
-                        fontWeight: '600',
-                        textDecoration: 'none',
-                        padding: 'clamp(0.5rem, 1.5vw, 0.75rem) clamp(0.75rem, 2vw, 1rem)',
-                        borderRadius: '12px',
-                        transition: 'all 0.3s ease',
-                        fontSize: 'clamp(0.9rem, 2vw, 1rem)'
-                      }}
-                      onMouseEnter={(e) => {
-                        e.target.style.backgroundColor = 'rgba(107, 114, 128, 0.1)';
-                        e.target.style.color = '#374151';
-                      }}
-                      onMouseLeave={(e) => {
-                        e.target.style.backgroundColor = 'transparent';
-                        e.target.style.color = '#6b7280';
-                      }}
-                    >
-                      Login
-                    </Nav.Link>
-                  </motion.div>
-                  
-                  <motion.div
-                    initial={{ opacity: 0, scale: 0.8 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    transition={{ delay: 0.75 }}
-                    style={{ marginLeft: '0.5rem' }}
-                  >
-                    <Button
-                      as={Link}
-                      to="/signup"
-                      variant="outline-primary"
-                      style={{
-                        borderRadius: '50px',
-                        padding: 'clamp(0.5rem, 1.5vw, 0.75rem) clamp(1rem, 2.5vw, 1.5rem)',
-                        fontWeight: '600',
-                        fontSize: 'clamp(0.85rem, 1.8vw, 0.95rem)',
-                        transition: 'all 0.3s ease',
-                        textDecoration: 'none'
-                      }}
-                    >
-                      Sign Up
-                    </Button>
-                  </motion.div>
-                </>
-              )}
-              
-              {/* CTA Button */}
-              <motion.div
-                initial={{ opacity: 0, scale: 0.8 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ delay: 0.8 }}
-                style={{ marginLeft: '0.5rem' }}
-              >
-                <Button
-                  as={Link}
-                  to="/contact"
-                  style={{
-                    background: 'linear-gradient(135deg, #3b82f6, #2563eb)',
-                    border: 'none',
-                    borderRadius: '50px',
-                    padding: 'clamp(0.5rem, 1.5vw, 0.75rem) clamp(1rem, 2.5vw, 1.5rem)',
-                    fontWeight: '600',
-                    fontSize: 'clamp(0.85rem, 1.8vw, 0.95rem)',
-                    boxShadow: '0 4px 15px rgba(59, 130, 246, 0.3)',
-                    transition: 'all 0.3s ease',
-                    display: 'flex',
-                    alignItems: 'center',
-                    gap: '0.5rem'
-                  }}
-                  onMouseEnter={(e) => {
-                    e.target.style.transform = 'translateY(-2px)';
-                    e.target.style.boxShadow = '0 8px 25px rgba(59, 130, 246, 0.4)';
-                    e.target.style.background = 'linear-gradient(135deg, #2563eb, #1d4ed8)';
-                  }}
-                  onMouseLeave={(e) => {
-                    e.target.style.transform = 'translateY(0)';
-                    e.target.style.boxShadow = '0 4px 15px rgba(59, 130, 246, 0.3)';
-                    e.target.style.background = 'linear-gradient(135deg, #3b82f6, #2563eb)';
-                  }}
-                >
-                  Get Quote
-                  <ArrowRight size={16} />
-                </Button>
-              </motion.div>
-            </Nav>
-          </Navbar.Collapse>
+            </motion.button>
+          </div>
         </Container>
-      </Navbar>
+      </nav>
 
-      {/* Mobile Menu Overlay */}
+      {/* Mobile Sidebar */}
       <AnimatePresence>
         {isMenuOpen && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            style={{
-              position: 'fixed',
-              top: '100%',
-              left: 0,
-              right: 0,
-              background: 'rgba(255, 255, 255, 0.98)',
-              backdropFilter: 'blur(20px)',
-              borderTop: '1px solid rgba(0, 0, 0, 0.1)',
-              padding: '2rem 0',
-              boxShadow: '0 10px 40px rgba(0, 0, 0, 0.1)',
-              zIndex: 1040,
-              display: window.innerWidth >= 992 ? 'none' : 'block'
-            }}
-          >
-            <Container>
+          <>
+            {/* Backdrop */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setIsMenuOpen(false)}
+              style={{
+                position: 'fixed',
+                top: 0,
+                left: 0,
+                right: 0,
+                bottom: 0,
+                background: 'rgba(0, 0, 0, 0.5)',
+                zIndex: 1040
+              }}
+              className="d-lg-none"
+            />
+            
+            {/* Sidebar */}
+            <motion.div
+              initial={{ x: '100%' }}
+              animate={{ x: 0 }}
+              exit={{ x: '100%' }}
+              transition={{ type: 'tween', duration: 0.3 }}
+              style={{
+                position: 'fixed',
+                top: 0,
+                right: 0,
+                width: '300px',
+                height: '100vh',
+                background: 'rgba(255, 255, 255, 0.98)',
+                backdropFilter: 'blur(20px)',
+                boxShadow: '-10px 0 40px rgba(0, 0, 0, 0.1)',
+                zIndex: 1050,
+                overflowY: 'auto',
+                padding: '2rem 1.5rem'
+              }}
+              className="d-lg-none"
+            >
               <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
                 {navItems.map((item, index) => {
                   const isActive = isActiveLink(item.path);
@@ -620,8 +635,8 @@ const Header = () => {
                   </Button>
                 </motion.div>
               </div>
-            </Container>
-          </motion.div>
+            </motion.div>
+          </>
         )}
       </AnimatePresence>
     </motion.header>

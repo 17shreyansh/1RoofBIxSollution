@@ -16,7 +16,7 @@ router.get('/', async (req, res) => {
 });
 
 // Admin routes (must come before /:slug)
-router.get('/admin', async (req, res) => {
+router.get('/admin', auth, async (req, res) => {
   try {
     const services = await Service.find().sort({ order: 1, createdAt: -1 });
     res.json(services);
@@ -27,7 +27,7 @@ router.get('/admin', async (req, res) => {
 });
 
 // Get service by ID for admin editing
-router.get('/admin/:id', async (req, res) => {
+router.get('/admin/:id', auth, async (req, res) => {
   try {
     const service = await Service.findById(req.params.id);
     if (!service) return res.status(404).json({ message: 'Service not found' });
@@ -49,7 +49,7 @@ router.get('/:slug', async (req, res) => {
   }
 });
 
-router.post('/', async (req, res) => {
+router.post('/', auth, async (req, res) => {
   try {
     const serviceData = { ...req.body };
     if (req.file) serviceData.image = `/uploads/${req.file.filename}`;
@@ -62,7 +62,7 @@ router.post('/', async (req, res) => {
   }
 });
 
-router.put('/:id', async (req, res) => {
+router.put('/:id', auth, async (req, res) => {
   try {
     const updateData = { ...req.body };
     if (req.file) updateData.image = `/uploads/${req.file.filename}`;
@@ -74,7 +74,7 @@ router.put('/:id', async (req, res) => {
   }
 });
 
-router.delete('/:id', async (req, res) => {
+router.delete('/:id', auth, async (req, res) => {
   try {
     await Service.findByIdAndDelete(req.params.id);
     res.json({ message: 'Service deleted' });

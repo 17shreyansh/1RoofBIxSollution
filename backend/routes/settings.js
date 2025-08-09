@@ -5,7 +5,7 @@ const crypto = require('crypto');
 
 const router = express.Router();
 
-// Simple encryption for demo (use proper encryption in production)
+// Simple base64 encoding
 const encrypt = (text) => {
   return Buffer.from(text).toString('base64');
 };
@@ -47,10 +47,11 @@ router.post('/razorpay', auth, async (req, res) => {
     );
     
     // Update or create Key Secret (encrypted)
+    const encryptedSecret = encrypt(keySecret);
     await Settings.findOneAndUpdate(
       { key: 'razorpay_key_secret' },
       { 
-        value: encrypt(keySecret), 
+        value: encryptedSecret, 
         encrypted: true,
         description: 'Razorpay Key Secret (Encrypted)' 
       },

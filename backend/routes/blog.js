@@ -26,7 +26,7 @@ router.get('/', async (req, res) => {
 });
 
 // Admin routes (must come before /:slug)
-router.get('/admin', async (req, res) => {
+router.get('/admin', auth, async (req, res) => {
   try {
     const blogs = await Blog.find().sort({ createdAt: -1 });
     res.json(blogs);
@@ -36,7 +36,7 @@ router.get('/admin', async (req, res) => {
 });
 
 // Get blog by ID for admin editing
-router.get('/admin/:id', async (req, res) => {
+router.get('/admin/:id', auth, async (req, res) => {
   try {
     const blog = await Blog.findById(req.params.id);
     if (!blog) return res.status(404).json({ message: 'Blog not found' });
@@ -57,7 +57,7 @@ router.get('/:slug', async (req, res) => {
   }
 });
 
-router.post('/', upload.single('featuredImage'), async (req, res) => {
+router.post('/', auth, upload.single('featuredImage'), async (req, res) => {
   try {
     const blogData = { ...req.body };
     if (req.file) blogData.featuredImage = `/uploads/${req.file.filename}`;
@@ -76,7 +76,7 @@ router.post('/', upload.single('featuredImage'), async (req, res) => {
   }
 });
 
-router.put('/:id', upload.single('featuredImage'), async (req, res) => {
+router.put('/:id', auth, upload.single('featuredImage'), async (req, res) => {
   try {
     const updateData = { ...req.body };
     if (req.file) updateData.featuredImage = `/uploads/${req.file.filename}`;
@@ -134,7 +134,7 @@ router.post('/upload-image', auth, (req, res) => {
   });
 });
 
-router.delete('/:id', async (req, res) => {
+router.delete('/:id', auth, async (req, res) => {
   try {
     await Blog.findByIdAndDelete(req.params.id);
     res.json({ message: 'Blog deleted' });

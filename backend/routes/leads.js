@@ -16,7 +16,7 @@ router.post('/', async (req, res) => {
 });
 
 // Get all leads (admin)
-router.get('/admin', async (req, res) => {
+router.get('/admin', auth, async (req, res) => {
   try {
     const { status, type } = req.query;
     const filter = {};
@@ -31,7 +31,7 @@ router.get('/admin', async (req, res) => {
 });
 
 // Update lead status (admin)
-router.put('/:id', async (req, res) => {
+router.put('/:id', auth, async (req, res) => {
   try {
     const lead = await Lead.findByIdAndUpdate(req.params.id, req.body, { new: true });
     res.json(lead);
@@ -41,7 +41,7 @@ router.put('/:id', async (req, res) => {
 });
 
 // Delete lead (admin)
-router.delete('/:id', async (req, res) => {
+router.delete('/:id', auth, async (req, res) => {
   try {
     await Lead.findByIdAndDelete(req.params.id);
     res.json({ message: 'Lead deleted' });
@@ -51,14 +51,14 @@ router.delete('/:id', async (req, res) => {
 });
 
 // Add note to lead
-router.post('/:id/notes', async (req, res) => {
+router.post('/:id/notes', auth, async (req, res) => {
   try {
     const lead = await Lead.findById(req.params.id);
     if (!lead) return res.status(404).json({ message: 'Lead not found' });
     
     lead.notes.push({
       content: req.body.content,
-      addedBy: null,
+      addedBy: req.user._id,
       addedAt: new Date()
     });
     
@@ -70,7 +70,7 @@ router.post('/:id/notes', async (req, res) => {
 });
 
 // Export leads to CSV
-router.get('/export', async (req, res) => {
+router.get('/export', auth, async (req, res) => {
   try {
     const leads = await Lead.find().sort({ createdAt: -1 });
     
@@ -78,6 +78,7 @@ router.get('/export', async (req, res) => {
     const csvData = leads.map(lead => 
       `"${lead.name}","${lead.email}","${lead.phone || ''}","${lead.company || ''}","${lead.service || ''}","${lead.product || ''}","${lead.type}","${lead.status}","${lead.message || ''}","${lead.createdAt}"`
     ).join('\n');
+    
     
     res.setHeader('Content-Type', 'text/csv');
     res.setHeader('Content-Disposition', 'attachment; filename=leads.csv');

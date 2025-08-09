@@ -20,7 +20,7 @@ router.get('/', async (req, res) => {
 });
 
 // Admin routes (must come before /:slug)
-router.get('/admin', async (req, res) => {
+router.get('/admin', auth, async (req, res) => {
   try {
     const portfolio = await Portfolio.find().sort({ order: 1, createdAt: -1 });
     res.json(portfolio);
@@ -31,7 +31,7 @@ router.get('/admin', async (req, res) => {
 });
 
 // Get portfolio by ID for admin editing
-router.get('/admin/:id', async (req, res) => {
+router.get('/admin/:id', auth, async (req, res) => {
   try {
     const portfolio = await Portfolio.findById(req.params.id);
     if (!portfolio) return res.status(404).json({ message: 'Portfolio item not found' });
@@ -53,7 +53,7 @@ router.get('/:slug', async (req, res) => {
   }
 });
 
-router.post('/', upload.fields([{ name: 'image', maxCount: 1 }, { name: 'gallery', maxCount: 10 }]), async (req, res) => {
+router.post('/', auth, upload.fields([{ name: 'image', maxCount: 1 }, { name: 'gallery', maxCount: 10 }]), async (req, res) => {
   try {
     const portfolioData = { ...req.body };
     
@@ -75,7 +75,7 @@ router.post('/', upload.fields([{ name: 'image', maxCount: 1 }, { name: 'gallery
   }
 });
 
-router.put('/:id', (req, res) => {
+router.put('/:id', auth, (req, res) => {
   upload.fields([{ name: 'image', maxCount: 1 }, { name: 'gallery', maxCount: 10 }])(req, res, async (err) => {
     if (err) {
       console.error('Multer error:', err);
@@ -118,7 +118,7 @@ router.put('/:id', (req, res) => {
   });
 });
 
-router.delete('/:id', async (req, res) => {
+router.delete('/:id', auth, async (req, res) => {
   try {
     await Portfolio.findByIdAndDelete(req.params.id);
     res.json({ message: 'Portfolio item deleted' });

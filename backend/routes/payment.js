@@ -5,10 +5,11 @@ const Order = require('../models/Order');
 const Customer = require('../models/Customer');
 const Service = require('../models/Service');
 const Settings = require('../models/Settings');
+const customerAuth = require('../middleware/customerAuth');
 const jwt = require('jsonwebtoken');
 const bcrypt = require('bcryptjs');
 
-// Simple decrypt function
+// Simple base64 decoding
 const decrypt = (text) => {
   return Buffer.from(text, 'base64').toString('utf8');
 };
@@ -32,8 +33,8 @@ const getRazorpayInstance = async () => {
   });
 };
 
-// Create order
-router.post('/create-order', async (req, res) => {
+// Create order (requires authentication)
+router.post('/create-order', customerAuth, async (req, res) => {
   try {
     const { serviceId, packageType, customerDetails } = req.body;
     
@@ -56,19 +57,14 @@ router.post('/create-order', async (req, res) => {
       receipt: orderId
     });
     
-    // Check if customer exists or create new one
-    let customer = await Customer.findOne({ email: customerDetails.email });
-    if (!customer) {
-      const tempPassword = Math.random().toString(36).slice(-8);
-      customer = new Customer({
-        email: customerDetails.email,
-        password: tempPassword,
-        name: customerDetails.name,
-        phone: customerDetails.phone,
-        company: customerDetails.company
-      });
-      await customer.save();
-    }
+    // Use authenticated customer
+    const customer = req.customer;
+    
+    // Update customer details if provided
+    if (customerDetails.name) customer.name = customerDetails.name;
+    if (customerDetails.phone) customer.phone = customerDetails.phone;
+    if (customerDetails.company) customer.company = customerDetails.company;
+    await customer.save();
     
     const order = new Order({
       orderId,
@@ -96,10 +92,10 @@ router.post('/create-order', async (req, res) => {
   }
 });
 
-// Verify payment
-router.post('/verify-payment', async (req, res) => {
+// Verify payment (requires authentication)
+router.post('/verify-payment', customerAuth, async (req, res) => {
   try {
-    const { razorpay_order_id, razorpay_payment_id, razorpay_signature, customerId } = req.body;
+    const { razorpay_order_id, razorpay_payment_id, razorpay_signature } = req.body;
     
     const keySecretDoc = await Settings.findOne({ key: 'razorpay_key_secret' });
     const keySecret = keySecretDoc.encrypted ? decrypt(keySecretDoc.value) : keySecretDoc.value;
@@ -123,19 +119,7 @@ router.post('/verify-payment', async (req, res) => {
     order.razorpaySignature = razorpay_signature;
     await order.save();
     
-    // Generate JWT token for customer
-    const customer = await Customer.findById(customerId);
-    const token = jwt.sign({ id: customer._id, type: 'customer' }, process.env.JWT_SECRET);
-    
-    res.json({ 
-      success: true, 
-      token,
-      customer: {
-        id: customer._id,
-        email: customer.email,
-        name: customer.name
-      }
-    });
+    res.json({ success: true });
   } catch (error) {
     res.status(500).json({ message: error.message });
   }

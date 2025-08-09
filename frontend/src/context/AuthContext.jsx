@@ -22,10 +22,11 @@ export const AuthProvider = ({ children }) => {
     const token = localStorage.getItem('token');
     const customerToken = localStorage.getItem('customerToken');
     
-    if (token) {
-      verifyAdminToken();
-    } else if (customerToken) {
+    // Prioritize customer token if both exist to avoid conflicts
+    if (customerToken) {
       verifyCustomerToken();
+    } else if (token) {
+      verifyAdminToken();
     } else {
       setLoading(false);
     }
@@ -82,7 +83,10 @@ export const AuthProvider = ({ children }) => {
   };
 
   const setCustomerFromPayment = (token, customerData) => {
+    // Clear any existing admin token to prevent conflicts
+    localStorage.removeItem('token');
     localStorage.setItem('customerToken', token);
+    setUser(null);
     setCustomer(customerData);
   };
 

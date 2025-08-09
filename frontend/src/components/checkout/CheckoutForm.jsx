@@ -1,6 +1,7 @@
 import { useState } from 'react';
-import { CreditCard } from 'lucide-react';
+import { CreditCard, Shield } from 'lucide-react';
 import { useAuth } from '../../context/AuthContext';
+import AuthModal from './AuthModal';
 import api from '../../utils/api';
 
 const CheckoutForm = ({ service, packageType, onSuccess }) => {
@@ -13,19 +14,40 @@ const CheckoutForm = ({ service, packageType, onSuccess }) => {
   });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
-  const { customer, setCustomerFromPayment } = useAuth();
+  const [showAuthModal, setShowAuthModal] = useState(false);
+  const { customer, isCustomerAuthenticated } = useAuth();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setError('');
+
+    // Check if customer is authenticated
+    if (!isCustomerAuthenticated) {
+      setShowAuthModal(true);
+      return;
+    }
+
+    await processPayment();
+  };
+
+  const processPayment = async () => {
     setLoading(true);
     setError('');
 
     try {
-      // Create order
+      // Create order with authenticated customer
       const orderResponse = await api.post('/payment/create-order', {
         serviceId: service._id,
         packageType,
-        customerDetails: formData
+        customerDetails: {
+          ...formData,
+          name: customer?.name || formData.name,
+          email: customer?.email || formData.email,
+          phone: customer?.phone || formData.phone,
+          company: customer?.company || formData.company
+        }
+      }, {
+        headers: { Authorization: `Bearer ${localStorage.getItem('customerToken')}` }
       });
 
       // Load Razorpay script
@@ -44,12 +66,12 @@ const CheckoutForm = ({ service, packageType, onSuccess }) => {
               const verifyResponse = await api.post('/payment/verify-payment', {
                 razorpay_order_id: response.razorpay_order_id,
                 razorpay_payment_id: response.razorpay_payment_id,
-                razorpay_signature: response.razorpay_signature,
-                customerId: orderResponse.data.customerId
+                razorpay_signature: response.razorpay_signature
+              }, {
+                headers: { Authorization: `Bearer ${localStorage.getItem('customerToken')}` }
               });
 
               if (verifyResponse.data.success) {
-                setCustomerFromPayment(verifyResponse.data.token, verifyResponse.data.customer);
                 onSuccess();
               }
             } catch (error) {
@@ -57,9 +79,9 @@ const CheckoutForm = ({ service, packageType, onSuccess }) => {
             }
           },
           prefill: {
-            name: formData.name,
-            email: formData.email,
-            contact: formData.phone
+            name: customer?.name || formData.name,
+            email: customer?.email || formData.email,
+            contact: customer?.phone || formData.phone
           },
           theme: {
             color: '#007bff'
@@ -77,8 +99,21 @@ const CheckoutForm = ({ service, packageType, onSuccess }) => {
     }
   };
 
+  const handleAuthSuccess = () => {
+    setShowAuthModal(false);
+    processPayment();
+  };
+
   return (
-    <div className="card border-0 shadow-sm" style={{ borderRadius: '20px' }}>
+    <>
+      <AuthModal
+        show={showAuthModal}
+        onHide={() => setShowAuthModal(false)}
+        onSuccess={handleAuthSuccess}
+        customerDetails={formData}
+      />
+      
+      <div className="card border-0 shadow-sm" style={{ borderRadius: '20px' }}>
       <div className="card-body p-4">
         <div className="mb-4">
           <h4 style={{ color: '#1f2937', fontWeight: '700', marginBottom: '0.5rem' }}>
@@ -109,8 +144,9 @@ const CheckoutForm = ({ service, packageType, onSuccess }) => {
                   fontSize: '1rem'
                 }}
                 placeholder="Enter your full name"
-                value={formData.name}
+                value={isCustomerAuthenticated ? customer?.name || '' : formData.name}
                 onChange={(e) => setFormData({...formData, name: e.target.value})}
+                readOnly={isCustomerAuthenticated}
                 required
               />
             </div>
@@ -126,8 +162,9 @@ const CheckoutForm = ({ service, packageType, onSuccess }) => {
                   fontSize: '1rem'
                 }}
                 placeholder="Enter your email"
-                value={formData.email}
+                value={isCustomerAuthenticated ? customer?.email || '' : formData.email}
                 onChange={(e) => setFormData({...formData, email: e.target.value})}
+                readOnly={isCustomerAuthenticated}
                 required
               />
             </div>
@@ -146,8 +183,9 @@ const CheckoutForm = ({ service, packageType, onSuccess }) => {
                   fontSize: '1rem'
                 }}
                 placeholder="Enter your phone number"
-                value={formData.phone}
+                value={isCustomerAuthenticated ? customer?.phone || '' : formData.phone}
                 onChange={(e) => setFormData({...formData, phone: e.target.value})}
+                readOnly={isCustomerAuthenticated}
                 required
               />
             </div>
@@ -163,8 +201,9 @@ const CheckoutForm = ({ service, packageType, onSuccess }) => {
                   fontSize: '1rem'
                 }}
                 placeholder="Company name (optional)"
-                value={formData.company}
+                value={isCustomerAuthenticated ? customer?.company || '' : formData.company}
                 onChange={(e) => setFormData({...formData, company: e.target.value})}
+                readOnly={isCustomerAuthenticated}
               />
             </div>
           </div>
@@ -211,7 +250,10 @@ const CheckoutForm = ({ service, packageType, onSuccess }) => {
             ) : (
               <>
                 <CreditCard size={20} />
-                Pay ₹{service.pricing[packageType]?.price?.toLocaleString()}
+                {isCustomerAuthenticated 
+                  ? `Pay ₹${service.pricing[packageType]?.price?.toLocaleString()}`
+                  : 'Continue to Payment'
+                }
               </>
             )}
           </button>
@@ -222,8 +264,23 @@ const CheckoutForm = ({ service, packageType, onSuccess }) => {
             </small>
           </div>
         </form>
+        
+        {!isCustomerAuthenticated && (
+          <div className="mt-3 p-3" style={{ background: '#fef3c7', borderRadius: '12px', border: '1px solid #f59e0b' }}>
+            <div className="d-flex align-items-center">
+              <Shield size={20} className="text-warning me-2" />
+              <div>
+                <small className="fw-semibold text-warning">Secure Checkout</small>
+                <div className="text-muted" style={{ fontSize: '0.85rem' }}>
+                  You'll be asked to login or create an account before payment for security.
+                </div>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
+    </>
   );
 };
 
