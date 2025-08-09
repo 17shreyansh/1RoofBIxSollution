@@ -4,101 +4,32 @@ import { Container, Row, Col, Card, Button, Badge } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
 import { Calendar, User, ArrowRight, Clock, Star, BookOpen } from 'lucide-react';
 import api from '../utils/api';
+import { useContent } from '../context/ContentContext';
 
 const Blog = () => {
-  const [posts, setPosts] = useState([
-    {
-      _id: '1',
-      title: 'The Future of Web Development: Trends to Watch in 2024',
-      excerpt: 'Explore the latest trends shaping the web development landscape, from AI integration to progressive web apps.',
-      content: 'Full article content...',
-      author: 'John Smith',
-      publishedAt: '2024-01-15',
-      category: 'Web Development',
-      image: '/api/placeholder/800/400',
-      slug: 'future-web-development-2024',
-      readTime: '5 min read'
-    },
-    {
-      _id: '2',
-      title: 'Digital Marketing Strategies That Actually Work',
-      excerpt: 'Discover proven digital marketing strategies that drive real results and boost your online presence.',
-      content: 'Full article content...',
-      author: 'Sarah Johnson',
-      publishedAt: '2024-01-12',
-      category: 'Digital Marketing',
-      image: '/api/placeholder/800/400',
-      slug: 'digital-marketing-strategies',
-      readTime: '7 min read'
-    },
-    {
-      _id: '3',
-      title: 'UI/UX Design Principles for Better User Experience',
-      excerpt: 'Learn the fundamental design principles that create intuitive and engaging user experiences.',
-      content: 'Full article content...',
-      author: 'Mike Davis',
-      publishedAt: '2024-01-10',
-      category: 'Design',
-      image: '/api/placeholder/800/400',
-      slug: 'ux-design-principles',
-      readTime: '6 min read'
-    },
-    {
-      _id: '4',
-      title: 'SEO Best Practices for 2024: A Complete Guide',
-      excerpt: 'Stay ahead of the competition with the latest SEO strategies and best practices for better rankings.',
-      content: 'Full article content...',
-      author: 'Emily Chen',
-      publishedAt: '2024-01-08',
-      category: 'SEO',
-      image: '/api/placeholder/800/400',
-      slug: 'seo-best-practices-2024',
-      readTime: '8 min read'
-    },
-    {
-      _id: '5',
-      title: 'Building Scalable E-commerce Solutions',
-      excerpt: 'Learn how to build e-commerce platforms that can handle growth and provide excellent user experience.',
-      content: 'Full article content...',
-      author: 'David Wilson',
-      publishedAt: '2024-01-05',
-      category: 'E-commerce',
-      image: '/api/placeholder/800/400',
-      slug: 'scalable-ecommerce-solutions',
-      readTime: '10 min read'
-    },
-    {
-      _id: '6',
-      title: 'The Power of Brand Identity in Digital Age',
-      excerpt: 'Understand how strong brand identity can differentiate your business in the competitive digital landscape.',
-      content: 'Full article content...',
-      author: 'Lisa Anderson',
-      publishedAt: '2024-01-03',
-      category: 'Branding',
-      image: '/api/placeholder/800/400',
-      slug: 'brand-identity-digital-age',
-      readTime: '4 min read'
-    }
-  ]);
-
+  const [posts, setPosts] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [featuredPost, setFeaturedPost] = useState(null);
+  const { content: dynamicContent, loading: contentLoading } = useContent();
+  const content = dynamicContent.blog || {};
 
   useEffect(() => {
-    fetchPosts();
+    fetchData();
   }, []);
 
-  const fetchPosts = async () => {
+  const fetchData = async () => {
     try {
-      const response = await api.get('/blog');
-      if (response.data?.length) {
-        setPosts(response.data);
-        setFeaturedPost(response.data[0]);
-      } else {
-        setFeaturedPost(posts[0]);
-      }
+      setLoading(true);
+      const postsRes = await api.get('/blog');
+      const postsData = postsRes.data.blogs || postsRes.data || [];
+      setPosts(postsData);
+      setFeaturedPost(postsData.length > 0 ? postsData[0] : null);
     } catch (error) {
-      console.error('Error fetching blog posts:', error);
-      setFeaturedPost(posts[0]);
+      console.error('Error fetching data:', error);
+      setPosts([]);
+      setFeaturedPost(null);
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -109,6 +40,25 @@ const Blog = () => {
       day: 'numeric'
     });
   };
+
+  if (loading || contentLoading) {
+    return (
+      <div style={{ 
+        minHeight: '100vh', 
+        display: 'flex', 
+        alignItems: 'center', 
+        justifyContent: 'center',
+        paddingTop: '140px'
+      }}>
+        <div className="text-center">
+          <div className="spinner-border text-primary" role="status" style={{ width: '3rem', height: '3rem' }}>
+            <span className="visually-hidden">Loading...</span>
+          </div>
+          <p style={{ marginTop: '1rem', color: '#6b7280' }}>Loading blog posts...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div style={{ minHeight: '100vh' }}>
@@ -157,7 +107,7 @@ const Blog = () => {
                 transition={{ delay: 0.3 }}
               >
                 <BookOpen size={16} style={{ marginRight: '0.5rem', color: '#10b981' }} />
-                Knowledge & Insights
+                {content.heroBadgeText || 'Knowledge & Insights'}
               </motion.div>
               
               <h1 style={{
@@ -167,14 +117,11 @@ const Blog = () => {
                 fontFamily: 'Poppins, sans-serif',
                 lineHeight: '1.1'
               }}>
-                Our 
-                <span style={{
+                Our<span style={{
                   background: 'linear-gradient(135deg, #3b82f6, #8b5cf6)',
                   WebkitBackgroundClip: 'text',
                   WebkitTextFillColor: 'transparent'
-                }}>
-                  Blog
-                </span>
+                }}>Blog</span>
               </h1>
               <p style={{
                 fontSize: '1.25rem',
@@ -183,7 +130,7 @@ const Blog = () => {
                 margin: '0 auto',
                 lineHeight: '1.7'
               }}>
-                Insights, tips, and industry knowledge to help you stay ahead in the digital world.
+                {content.heroSubtitle || 'Insights, tips, and industry knowledge to help you stay ahead in the digital world.'}
               </p>
             </motion.div>
           </div>
@@ -224,7 +171,7 @@ const Blog = () => {
                       overflow: 'hidden'
                     }}>
                       <img 
-                        src={featuredPost.image || '/api/placeholder/800/400'} 
+                        src={featuredPost.featuredImage || '/api/placeholder/800/400'} 
                         alt={featuredPost.title}
                         style={{
                           width: '100%',
@@ -365,17 +312,17 @@ const Blog = () => {
               marginBottom: '1rem',
               color: '#1f2937',
               fontFamily: 'Poppins, sans-serif'
-            }}>Latest Articles</h2>
+            }}>{content.blogTitle || 'Latest Articles'}</h2>
             <p style={{
               fontSize: 'clamp(1rem, 2.5vw, 1.2rem)',
               color: '#6b7280',
               maxWidth: '600px',
               margin: '0 auto'
-            }}>Stay updated with the latest trends, tips, and insights from our experts</p>
+            }}>{content.blogSubtitle || 'Stay updated with the latest trends, tips, and insights from our experts'}</p>
           </motion.div>
 
           <Row>
-            {posts.slice(1).map((post, index) => (
+            {Array.isArray(posts) && posts.length > 1 && posts.slice(1).map((post, index) => (
               <Col key={post._id} md={6} lg={4} className="mb-4">
                 <motion.div 
                   initial={{ opacity: 0, y: 20 }}
@@ -399,7 +346,7 @@ const Blog = () => {
                       overflow: 'hidden'
                     }}>
                       <img 
-                        src={post.image || '/api/placeholder/400/300'} 
+                        src={post.featuredImage || '/api/placeholder/400/300'} 
                         alt={post.title}
                         style={{
                           width: '100%',
@@ -511,6 +458,13 @@ const Blog = () => {
                 </motion.div>
               </Col>
             ))}
+            {(!Array.isArray(posts) || posts.length <= 1) && (
+              <Col xs={12} className="text-center">
+                <p style={{ color: '#6b7280', fontSize: '1.1rem', padding: '3rem 0' }}>
+                  No blog posts available at the moment.
+                </p>
+              </Col>
+            )}
           </Row>
         </Container>
       </section>

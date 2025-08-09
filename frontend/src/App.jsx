@@ -1,6 +1,7 @@
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
 import 'bootstrap/dist/css/bootstrap.min.css';
 import { AuthProvider } from './context/AuthContext';
+import { ContentProvider } from './context/ContentContext';
 import Layout from './components/layout/Layout';
 import AdminLayout from './components/admin/AdminLayout';
 import Dashboard from './components/admin/Dashboard';
@@ -12,6 +13,7 @@ import BlogEdit from './components/admin/BlogEdit';
 import PortfolioManager from './components/admin/PortfolioManager';
 import BlogManager from './components/admin/BlogManager';
 import LeadManager from './components/admin/LeadManager';
+import TestimonialManager from './components/admin/TestimonialManager';
 import Home from './pages/Home';
 import About from './pages/About';
 import Services from './pages/Services';
@@ -27,7 +29,8 @@ import ProtectedRoute from './components/common/ProtectedRoute';
 function App() {
   return (
     <AuthProvider>
-      <Router>
+      <ContentProvider>
+        <Router>
         <Routes>
           {/* Public Routes */}
           <Route path="/" element={<Layout><Home /></Layout>} />
@@ -56,9 +59,11 @@ function App() {
             <Route path="portfolio" element={<PortfolioManager />} />
             <Route path="blog" element={<BlogManager />} />
             <Route path="leads" element={<LeadManager />} />
+            <Route path="testimonials" element={<TestimonialManager />} />
           </Route>
         </Routes>
-      </Router>
+        </Router>
+      </ContentProvider>
     </AuthProvider>
   );
 }

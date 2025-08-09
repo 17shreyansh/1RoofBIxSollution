@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 import { Container, Row, Col, Card, Button, Badge } from 'react-bootstrap';
 import { ExternalLink, ArrowRight, Code, Palette, Smartphone, TrendingUp, Search, Globe } from 'lucide-react';
 
-const PortfolioSection = ({ portfolio }) => {
+const PortfolioSection = ({ portfolio, content = {} }) => {
   const portfolioCategories = {
     'Web Development': { 
       color: '#3b82f6', 
@@ -104,7 +104,7 @@ const PortfolioSection = ({ portfolio }) => {
             transition={{ delay: 0.2 }}
           >
             <Globe size={16} style={{ marginRight: '0.5rem' }} />
-            Our Portfolio
+            {content.portfolioTitle || 'Our Portfolio'}
           </motion.div>
           
           <h2 style={{
@@ -124,7 +124,7 @@ const PortfolioSection = ({ portfolio }) => {
             margin: '0 auto',
             lineHeight: '1.7'
           }}>
-            Discover how we've helped businesses achieve their digital goals and drive measurable results through innovative solutions and strategic partnerships.
+            {content.portfolioSubtitle || 'Discover how we\'ve helped businesses achieve their digital goals and drive measurable results through innovative solutions and strategic partnerships.'}
           </p>
         </motion.div>
 

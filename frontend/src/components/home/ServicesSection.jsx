@@ -3,7 +3,7 @@ import { ArrowRight, Code, Megaphone, Palette, ShoppingCart, Smartphone, Lightbu
 import { motion } from 'framer-motion';
 import { Container, Row, Col, Card, Button } from 'react-bootstrap';
 
-const ServicesSection = ({ services }) => {
+const ServicesSection = ({ services, content = {} }) => {
   const serviceIcons = {
     'Web Development': { icon: Code, gradient: 'linear-gradient(135deg, #3b82f6, #06b6d4)' },
     'Digital Marketing': { icon: Megaphone, gradient: 'linear-gradient(135deg, #8b5cf6, #ec4899)' },
@@ -66,7 +66,7 @@ const ServicesSection = ({ services }) => {
             transition={{ delay: 0.2 }}
           >
             <Code size={16} style={{ marginRight: '0.5rem' }} />
-            Our Services
+            {content.servicesTitle || 'Our Services'}
           </motion.div>
           
           <h2 style={{
@@ -101,7 +101,7 @@ const ServicesSection = ({ services }) => {
             margin: '0 auto',
             lineHeight: '1.7'
           }}>
-            From strategy to execution, we deliver comprehensive digital services that transform businesses and create lasting impact in today's competitive market.
+            {content.servicesSubtitle || 'From strategy to execution, we deliver comprehensive digital services that transform businesses and create lasting impact in today\'s competitive market.'}
           </p>
         </motion.div>
 

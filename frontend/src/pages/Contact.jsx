@@ -3,6 +3,7 @@ import { motion } from 'framer-motion';
 import { Container, Row, Col, Card, Button, Form, Alert } from 'react-bootstrap';
 import { Mail, Phone, MapPin, Send, Star, Clock, MessageCircle } from 'lucide-react';
 import api from '../utils/api';
+import { useContent } from '../context/ContentContext';
 
 const Contact = () => {
   const [formData, setFormData] = useState({
@@ -14,6 +15,8 @@ const Contact = () => {
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitStatus, setSubmitStatus] = useState(null);
+  const { content: dynamicContent, loading } = useContent();
+  const content = dynamicContent.contact || {};
 
   const handleChange = (e) => {
     setFormData({
@@ -38,6 +41,25 @@ const Contact = () => {
       setIsSubmitting(false);
     }
   };
+
+  if (loading) {
+    return (
+      <div style={{ 
+        minHeight: '100vh', 
+        display: 'flex', 
+        alignItems: 'center', 
+        justifyContent: 'center',
+        paddingTop: '140px'
+      }}>
+        <div className="text-center">
+          <div className="spinner-border text-primary" role="status" style={{ width: '3rem', height: '3rem' }}>
+            <span className="visually-hidden">Loading...</span>
+          </div>
+          <p style={{ marginTop: '1rem', color: '#6b7280' }}>Loading...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div style={{ minHeight: '100vh' }}>
@@ -86,7 +108,7 @@ const Contact = () => {
                 transition={{ delay: 0.3 }}
               >
                 <MessageCircle size={16} style={{ marginRight: '0.5rem', color: '#10b981' }} />
-                Let's Start a Conversation
+                {content.heroBadgeText || "Let's Start a Conversation"}
               </motion.div>
               
               <h1 style={{
@@ -96,14 +118,12 @@ const Contact = () => {
                 fontFamily: 'Poppins, sans-serif',
                 lineHeight: '1.1'
               }}>
-                Get In 
-                <span style={{
+               Get<span style={{
                   background: 'linear-gradient(135deg, #3b82f6, #8b5cf6)',
                   WebkitBackgroundClip: 'text',
                   WebkitTextFillColor: 'transparent'
                 }}>
-                  Touch
-                </span>
+                InTouch</span>
               </h1>
               <p style={{
                 fontSize: '1.25rem',
@@ -112,7 +132,7 @@ const Contact = () => {
                 margin: '0 auto',
                 lineHeight: '1.7'
               }}>
-                Ready to transform your business? Let's discuss your project and create something amazing together.
+                {content.heroSubtitle || "Ready to transform your business? Let's discuss your project and create something amazing together."}
               </p>
             </motion.div>
           </div>
@@ -144,11 +164,11 @@ const Contact = () => {
                       fontWeight: '700',
                       marginBottom: '0.5rem',
                       color: '#1f2937'
-                    }}>Send us a message</h3>
+                    }}>{content.formTitle || 'Send us a message'}</h3>
                     <p style={{
                       color: '#6b7280',
                       fontSize: 'clamp(0.9rem, 2vw, 1rem)'
-                    }}>Fill out the form below and we'll get back to you within 24 hours.</p>
+                    }}>{content.formSubtitle || "Fill out the form below and we'll get back to you within 24 hours."}</p>
                   </div>
                   
                   <Form onSubmit={handleSubmit}>
@@ -385,14 +405,14 @@ const Contact = () => {
                     fontWeight: '700',
                     marginBottom: '1rem',
                     color: '#1f2937'
-                  }}>Let's Connect</h3>
+                  }}>{content.contactTitle || "Let's Connect"}</h3>
                   <p style={{
                     color: '#6b7280',
                     fontSize: 'clamp(1rem, 2.2vw, 1.1rem)',
                     lineHeight: '1.7',
                     marginBottom: '2rem'
                   }}>
-                    We'd love to hear from you. Choose the most convenient way to get in touch, and we'll respond promptly.
+                    {content.contactDescription || "We'd love to hear from you. Choose the most convenient way to get in touch, and we'll respond promptly."}
                   </p>
                   
                   {/* Response Time Badge */}
@@ -408,7 +428,7 @@ const Contact = () => {
                     marginBottom: '2rem'
                   }}>
                     <Clock size={16} style={{ marginRight: '0.5rem' }} />
-                    Average response time: 2 hours
+                    {content.responseTime || 'Average response time: 2 hours'}
                   </div>
                 </div>
 
@@ -417,20 +437,20 @@ const Contact = () => {
                     {
                       icon: Mail,
                       title: 'Email',
-                      value: 'info@roofbizsolutions.com',
-                      description: 'Send us an email anytime'
+                      value: content.email || 'info@roofbizsolutions.com',
+                      description: content.emailDescription || 'Send us an email anytime'
                     },
                     {
                       icon: Phone,
                       title: 'Phone',
-                      value: '+1 (234) 567-890',
-                      description: 'Mon-Fri from 8am to 5pm'
+                      value: content.phone || '+1 (234) 567-890',
+                      description: content.phoneDescription || 'Mon-Fri from 8am to 5pm'
                     },
                     {
                       icon: MapPin,
                       title: 'Office',
-                      value: '123 Business St, City, State 12345',
-                      description: 'Visit us for a coffee chat'
+                      value: content.address || '123 Business St, City, State 12345',
+                      description: content.addressDescription || 'Visit us for a coffee chat'
                     }
                   ].map((contact, index) => {
                     const IconComponent = contact.icon;

@@ -21,167 +21,33 @@ const BlogDetail = () => {
   const [post, setPost] = useState(null);
   const [relatedPosts, setRelatedPosts] = useState([]);
   const [loading, setLoading] = useState(true);
-
-  // Comprehensive mock data
-  const mockPosts = {
-    'future-web-development-2024': {
-      title: 'The Future of Web Development: Trends to Watch in 2024',
-      slug: 'future-web-development-2024',
-      excerpt: 'Explore the latest trends shaping the web development landscape, from AI integration to progressive web apps.',
-      content: `
-        <h2>Introduction</h2>
-        <p>The web development landscape is constantly evolving, and 2024 promises to bring exciting new trends and technologies that will reshape how we build and interact with websites. From artificial intelligence integration to advanced progressive web apps, developers need to stay ahead of the curve to remain competitive.</p>
-        
-        <h2>1. AI-Powered Development Tools</h2>
-        <p>Artificial Intelligence is revolutionizing web development by automating repetitive tasks and enhancing developer productivity. AI-powered code completion, automated testing, and intelligent debugging tools are becoming essential parts of the modern developer's toolkit.</p>
-        
-        <h3>Key Benefits:</h3>
-        <ul>
-          <li>Faster development cycles</li>
-          <li>Reduced human error</li>
-          <li>Intelligent code suggestions</li>
-          <li>Automated optimization</li>
-        </ul>
-        
-        <h2>2. Progressive Web Apps (PWAs) Evolution</h2>
-        <p>Progressive Web Apps continue to bridge the gap between web and native applications. With improved offline capabilities, push notifications, and app-like experiences, PWAs are becoming the preferred choice for businesses looking to reach users across all platforms.</p>
-        
-        <h2>3. WebAssembly (WASM) Adoption</h2>
-        <p>WebAssembly is enabling high-performance applications to run in browsers at near-native speeds. This technology is particularly valuable for complex applications like games, image editors, and scientific simulations.</p>
-        
-        <h2>4. Serverless Architecture</h2>
-        <p>Serverless computing is simplifying deployment and scaling for web applications. With services like AWS Lambda, Vercel Functions, and Netlify Functions, developers can focus on code rather than infrastructure management.</p>
-        
-        <h2>5. Enhanced Security Measures</h2>
-        <p>As cyber threats evolve, web security becomes increasingly important. Zero-trust architecture, advanced authentication methods, and automated security scanning are becoming standard practices.</p>
-        
-        <h2>Conclusion</h2>
-        <p>The future of web development is bright, with technologies that promise to make development faster, more secure, and more accessible. By staying informed about these trends and gradually incorporating them into your workflow, you'll be well-positioned for success in 2024 and beyond.</p>
-      `,
-      author: 'John Smith',
-      authorBio: 'Senior Full-Stack Developer with 8+ years of experience in modern web technologies.',
-      authorImage: '/api/placeholder/100/100',
-      publishedAt: '2024-01-15',
-      category: 'Web Development',
-      tags: ['JavaScript', 'React', 'AI', 'PWA', 'WebAssembly'],
-      image: '/api/placeholder/1200/600',
-      readTime: '5 min read',
-      views: 1250,
-      likes: 89,
-      comments: 23,
-      seo: {
-        metaTitle: 'Future of Web Development 2024 - Latest Trends & Technologies',
-        metaDescription: 'Discover the top web development trends for 2024 including AI integration, PWAs, WebAssembly, and more.',
-        keywords: ['web development', '2024 trends', 'AI', 'PWA', 'WebAssembly']
-      }
-    },
-    'digital-marketing-strategies': {
-      title: 'Digital Marketing Strategies That Actually Work',
-      slug: 'digital-marketing-strategies',
-      excerpt: 'Discover proven digital marketing strategies that drive real results and boost your online presence.',
-      content: `
-        <h2>Introduction</h2>
-        <p>In today's competitive digital landscape, having effective marketing strategies is crucial for business success. This comprehensive guide explores proven tactics that deliver measurable results and help businesses grow their online presence.</p>
-        
-        <h2>1. Content Marketing Excellence</h2>
-        <p>Quality content remains the foundation of successful digital marketing. Creating valuable, relevant content that addresses your audience's pain points builds trust and establishes authority in your industry.</p>
-        
-        <h3>Content Strategy Tips:</h3>
-        <ul>
-          <li>Focus on solving customer problems</li>
-          <li>Maintain consistent publishing schedule</li>
-          <li>Optimize for search engines</li>
-          <li>Repurpose content across platforms</li>
-        </ul>
-        
-        <h2>2. Search Engine Optimization (SEO)</h2>
-        <p>SEO continues to be one of the most cost-effective marketing strategies. By optimizing your website for search engines, you can attract organic traffic and improve your online visibility.</p>
-        
-        <h2>3. Social Media Marketing</h2>
-        <p>Social media platforms offer unprecedented opportunities to connect with your audience. The key is choosing the right platforms and creating engaging content that resonates with your target demographic.</p>
-        
-        <h2>4. Email Marketing Automation</h2>
-        <p>Email marketing remains one of the highest ROI marketing channels. Automated email sequences can nurture leads, onboard new customers, and retain existing ones effectively.</p>
-        
-        <h2>5. Pay-Per-Click (PPC) Advertising</h2>
-        <p>PPC advertising provides immediate visibility and can be highly targeted. When executed properly, PPC campaigns can deliver excellent returns on investment.</p>
-        
-        <h2>Measuring Success</h2>
-        <p>The key to successful digital marketing is continuous measurement and optimization. Use analytics tools to track performance and make data-driven decisions.</p>
-        
-        <h2>Conclusion</h2>
-        <p>Successful digital marketing requires a multi-channel approach, consistent execution, and continuous optimization. By implementing these proven strategies, businesses can achieve sustainable growth and build lasting relationships with their customers.</p>
-      `,
-      author: 'Sarah Johnson',
-      authorBio: 'Digital Marketing Specialist with expertise in SEO, PPC, and content marketing.',
-      authorImage: '/api/placeholder/100/100',
-      publishedAt: '2024-01-12',
-      category: 'Digital Marketing',
-      tags: ['SEO', 'Content Marketing', 'Social Media', 'PPC', 'Email Marketing'],
-      image: '/api/placeholder/1200/600',
-      readTime: '7 min read',
-      views: 980,
-      likes: 67,
-      comments: 18,
-      seo: {
-        metaTitle: 'Proven Digital Marketing Strategies for Business Growth',
-        metaDescription: 'Learn effective digital marketing strategies including SEO, content marketing, social media, and PPC advertising.',
-        keywords: ['digital marketing', 'SEO', 'content marketing', 'social media', 'PPC']
-      }
-    }
-  };
-
-  const mockPost = mockPosts[slug] || mockPosts['future-web-development-2024'];
-
-  // Mock related posts
-  const mockRelatedPosts = [
-    {
-      _id: '1',
-      title: 'UI/UX Design Principles for Better User Experience',
-      slug: 'ux-design-principles',
-      excerpt: 'Learn the fundamental design principles that create intuitive and engaging user experiences.',
-      category: 'Design',
-      image: '/api/placeholder/400/250',
-      readTime: '6 min read',
-      publishedAt: '2024-01-10'
-    },
-    {
-      _id: '2',
-      title: 'SEO Best Practices for 2024: A Complete Guide',
-      slug: 'seo-best-practices-2024',
-      excerpt: 'Stay ahead of the competition with the latest SEO strategies and best practices.',
-      category: 'SEO',
-      image: '/api/placeholder/400/250',
-      readTime: '8 min read',
-      publishedAt: '2024-01-08'
-    },
-    {
-      _id: '3',
-      title: 'Building Scalable E-commerce Solutions',
-      slug: 'scalable-ecommerce-solutions',
-      excerpt: 'Learn how to build e-commerce platforms that can handle growth and provide excellent UX.',
-      category: 'E-commerce',
-      image: '/api/placeholder/400/250',
-      readTime: '10 min read',
-      publishedAt: '2024-01-05'
-    }
-  ];
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     fetchPost();
-    setRelatedPosts(mockRelatedPosts);
+    fetchRelatedPosts();
   }, [slug]);
 
   const fetchPost = async () => {
     try {
       setLoading(true);
-      // For now, use mock data
-      setPost(mockPost);
+      setError(null);
+      const response = await api.get(`/blog/${slug}`);
+      setPost(response.data);
     } catch (error) {
       console.error('Error fetching blog post:', error);
-      setPost(mockPost);
+      setError('Blog post not found');
     } finally {
       setLoading(false);
+    }
+  };
+
+  const fetchRelatedPosts = async () => {
+    try {
+      const response = await api.get('/blog?limit=3');
+      setRelatedPosts(response.data.blogs || []);
+    } catch (error) {
+      console.error('Error fetching related posts:', error);
     }
   };
 
@@ -191,6 +57,71 @@ const BlogDetail = () => {
       month: 'long',
       day: 'numeric'
     });
+  };
+
+  const renderEditorJSContent = (content) => {
+    if (!content) return '';
+    
+    try {
+      let contentData;
+      if (typeof content === 'string') {
+        if (content.trim().startsWith('<')) {
+          return content; // Already HTML
+        }
+        contentData = JSON.parse(content);
+      } else {
+        contentData = content;
+      }
+      
+      if (!contentData.blocks) return '';
+      
+      return contentData.blocks.map((block, index) => {
+        switch (block.type) {
+          case 'paragraph':
+            return `<p key="${index}" style="margin-bottom: 1.5rem; line-height: 1.8;">${block.data.text}</p>`;
+          
+          case 'header':
+            const level = block.data.level || 2;
+            const headerStyle = `margin: 2rem 0 1rem 0; font-weight: 700; color: #1f2937; font-family: 'Poppins', sans-serif;`;
+            return `<h${level} key="${index}" style="${headerStyle}">${block.data.text}</h${level}>`;
+          
+          case 'list':
+            const listItems = block.data.items.map(item => `<li style="margin-bottom: 0.5rem;">${item}</li>`).join('');
+            const listTag = block.data.style === 'ordered' ? 'ol' : 'ul';
+            return `<${listTag} key="${index}" style="margin-bottom: 1.5rem; padding-left: 1.5rem;">${listItems}</${listTag}>`;
+          
+          case 'quote':
+            return `<blockquote key="${index}" style="border-left: 4px solid #3b82f6; padding-left: 1.5rem; margin: 2rem 0; font-style: italic; font-size: 1.2rem; color: #4b5563;">
+              <p style="margin-bottom: 0.5rem;">${block.data.text}</p>
+              ${block.data.caption ? `<cite style="font-size: 0.9rem; color: #6b7280;">— ${block.data.caption}</cite>` : ''}
+            </blockquote>`;
+          
+          case 'code':
+            return `<pre key="${index}" style="background: #f3f4f6; padding: 1.5rem; border-radius: 8px; overflow-x: auto; margin: 1.5rem 0;"><code>${block.data.code}</code></pre>`;
+          
+          case 'image':
+            return `<div key="${index}" style="margin: 2rem 0; text-align: center;">
+              <img src="${block.data.file.url}" alt="${block.data.caption || ''}" style="max-width: 100%; height: auto; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1);" />
+              ${block.data.caption ? `<p style="margin-top: 0.5rem; font-size: 0.9rem; color: #6b7280; font-style: italic;">${block.data.caption}</p>` : ''}
+            </div>`;
+          
+          case 'delimiter':
+            return `<div key="${index}" style="text-align: center; margin: 3rem 0;"><span style="font-size: 1.5rem; color: #d1d5db;">* * *</span></div>`;
+          
+          case 'table':
+            const tableRows = block.data.content.map(row => 
+              `<tr>${row.map(cell => `<td style="padding: 0.75rem; border: 1px solid #e5e7eb;">${cell}</td>`).join('')}</tr>`
+            ).join('');
+            return `<div key="${index}" style="overflow-x: auto; margin: 1.5rem 0;"><table style="width: 100%; border-collapse: collapse; border: 1px solid #e5e7eb;">${tableRows}</table></div>`;
+          
+          default:
+            return `<p key="${index}" style="margin-bottom: 1.5rem;">${block.data.text || ''}</p>`;
+        }
+      }).join('');
+    } catch (error) {
+      console.error('Error rendering content:', error);
+      return content; // Fallback to original content
+    }
   };
 
   if (loading) {
@@ -212,12 +143,13 @@ const BlogDetail = () => {
     );
   }
 
-  if (!post) {
+  if (error || (!loading && !post)) {
     return (
       <div style={{ minHeight: '100vh', paddingTop: '140px' }}>
         <Container>
           <div className="text-center">
             <h1>Article Not Found</h1>
+            <p>The blog post you're looking for doesn't exist or has been removed.</p>
             <Link to="/blog" className="btn btn-primary">Back to Blog</Link>
           </div>
         </Container>
@@ -293,14 +225,16 @@ const BlogDetail = () => {
                   {post.title}
                 </h1>
                 
-                <p style={{
-                  fontSize: '1.2rem',
-                  color: 'rgba(255, 255, 255, 0.8)',
-                  marginBottom: '2rem',
-                  lineHeight: '1.7'
-                }}>
-                  {post.excerpt}
-                </p>
+                {post.excerpt && (
+                  <p style={{
+                    fontSize: '1.2rem',
+                    color: 'rgba(255, 255, 255, 0.8)',
+                    marginBottom: '2rem',
+                    lineHeight: '1.7'
+                  }}>
+                    {post.excerpt}
+                  </p>
+                )}
                 
                 <div style={{
                   display: 'flex',
@@ -313,16 +247,20 @@ const BlogDetail = () => {
                 }}>
                   <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
                     <Calendar size={16} />
-                    {formatDate(post.publishedAt)}
+                    {formatDate(post.publishedAt || post.createdAt)}
                   </div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                    <Clock size={16} />
-                    {post.readTime}
-                  </div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
-                    <Eye size={16} />
-                    {post.views?.toLocaleString()} views
-                  </div>
+                  {post.readTime && (
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                      <Clock size={16} />
+                      {post.readTime} min read
+                    </div>
+                  )}
+                  {post.views && (
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                      <Eye size={16} />
+                      {post.views?.toLocaleString()} views
+                    </div>
+                  )}
                 </div>
                 
                 <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap' }}>
@@ -361,15 +299,17 @@ const BlogDetail = () => {
               zIndex: 10
             }}
           >
-            <img 
-              src={post.image} 
-              alt={post.title}
-              style={{
-                width: '100%',
-                height: '400px',
-                objectFit: 'cover'
-              }}
-            />
+            {post.featuredImage && (
+              <img 
+                src={post.featuredImage} 
+                alt={post.title}
+                style={{
+                  width: '100%',
+                  height: '400px',
+                  objectFit: 'cover'
+                }}
+              />
+            )}
           </motion.div>
         </Container>
       </section>
@@ -390,7 +330,7 @@ const BlogDetail = () => {
                     lineHeight: '1.8',
                     color: '#374151'
                   }}
-                  dangerouslySetInnerHTML={{ __html: post.content }}
+                  dangerouslySetInnerHTML={{ __html: renderEditorJSContent(post.content) }}
                 />
                 
                 {/* Article Footer */}
@@ -405,32 +345,36 @@ const BlogDetail = () => {
                   gap: '1rem'
                 }}>
                   <div style={{ display: 'flex', gap: '1rem' }}>
-                    <Button
-                      variant="outline-primary"
-                      style={{
-                        borderRadius: '50px',
-                        padding: '0.5rem 1rem',
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '0.5rem'
-                      }}
-                    >
-                      <Heart size={16} />
-                      {post.likes} Likes
-                    </Button>
-                    <Button
-                      variant="outline-secondary"
-                      style={{
-                        borderRadius: '50px',
-                        padding: '0.5rem 1rem',
-                        display: 'flex',
-                        alignItems: 'center',
-                        gap: '0.5rem'
-                      }}
-                    >
-                      <MessageCircle size={16} />
-                      {post.comments} Comments
-                    </Button>
+                    {post.likes && (
+                      <Button
+                        variant="outline-primary"
+                        style={{
+                          borderRadius: '50px',
+                          padding: '0.5rem 1rem',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '0.5rem'
+                        }}
+                      >
+                        <Heart size={16} />
+                        {post.likes} Likes
+                      </Button>
+                    )}
+                    {post.comments && (
+                      <Button
+                        variant="outline-secondary"
+                        style={{
+                          borderRadius: '50px',
+                          padding: '0.5rem 1rem',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '0.5rem'
+                        }}
+                      >
+                        <MessageCircle size={16} />
+                        {post.comments} Comments
+                      </Button>
+                    )}
                     <Button
                       variant="outline-success"
                       style={{
@@ -491,7 +435,7 @@ const BlogDetail = () => {
                   }}>
                     <div style={{ height: '200px', overflow: 'hidden' }}>
                       <img 
-                        src={relatedPost.image} 
+                        src={relatedPost.featuredImage } 
                         alt={relatedPost.title}
                         style={{
                           width: '100%',
@@ -534,8 +478,8 @@ const BlogDetail = () => {
                         color: '#6b7280',
                         marginBottom: '1rem'
                       }}>
-                        <span>{formatDate(relatedPost.publishedAt)}</span>
-                        <span>{relatedPost.readTime}</span>
+                        <span>{formatDate(relatedPost.publishedAt || relatedPost.createdAt)}</span>
+                        {relatedPost.readTime && <span>{relatedPost.readTime} min read</span>}
                       </div>
                       <Button
                         as={Link}

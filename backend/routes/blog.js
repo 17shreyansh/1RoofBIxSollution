@@ -95,6 +95,45 @@ router.put('/:id', upload.single('featuredImage'), async (req, res) => {
   }
 });
 
+// Test endpoint for image upload
+router.post('/test-upload', auth, (req, res) => {
+  console.log('Test upload endpoint hit');
+  console.log('Headers:', req.headers);
+  res.json({ message: 'Test endpoint working', auth: !!req.user });
+});
+
+// Image upload for EditorJS
+router.post('/upload-image', auth, (req, res) => {
+  console.log('Image upload request received');
+  console.log('Headers:', req.headers);
+  console.log('User:', req.user);
+  
+  upload.single('image')(req, res, (err) => {
+    if (err) {
+      console.error('Multer error:', err);
+      return res.status(400).json({ success: 0, error: err.message });
+    }
+    
+    console.log('File:', req.file);
+    console.log('Body:', req.body);
+    
+    if (!req.file) {
+      console.log('No file uploaded');
+      return res.status(400).json({ success: 0, error: 'No image uploaded' });
+    }
+    
+    const imageUrl = `/uploads/${req.file.filename}`;
+    console.log('Image uploaded successfully:', imageUrl);
+    
+    res.json({
+      success: 1,
+      file: {
+        url: imageUrl
+      }
+    });
+  });
+});
+
 router.delete('/:id', async (req, res) => {
   try {
     await Blog.findByIdAndDelete(req.params.id);

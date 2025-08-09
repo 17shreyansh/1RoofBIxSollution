@@ -125,7 +125,7 @@ const Header = () => {
               transition={{ delay: 0.2 }}
             >
               <motion.a 
-                href="mailto:info@roofbizsolutions.com" 
+                href="mailto:info@1roofbizsolution.com" 
                 style={contactLinkStyle}
                 whileHover={{ 
                   backgroundColor: 'rgba(255, 255, 255, 0.1)',
@@ -133,10 +133,10 @@ const Header = () => {
                 }}
               >
                 <Mail size={16} />
-                <span>info@roofbizsolutions.com</span>
+                <span>info@1roofbizsolution.com</span>
               </motion.a>
               <motion.a 
-                href="tel:+1234567890" 
+                href="tel:+919876543210" 
                 style={contactLinkStyle}
                 whileHover={{ 
                   backgroundColor: 'rgba(255, 255, 255, 0.1)',
@@ -144,7 +144,7 @@ const Header = () => {
                 }}
               >
                 <Phone size={16} />
-                <span>+1 (234) 567-890</span>
+                <span>+91 98765 43210</span>
               </motion.a>
             </motion.div>
 
@@ -187,7 +187,7 @@ const Header = () => {
             >
               <img 
                 src={logo} 
-                alt="Roof Biz Solutions" 
+                alt="1roofBizSolution" 
                 style={{
                   height: 'clamp(40px, 5vw, 50px)',
                   width: 'auto',

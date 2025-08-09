@@ -64,6 +64,11 @@ const AdminLayout = () => {
       icon: <ContactsOutlined />,
       label: 'Leads',
     },
+    {
+      key: '/admin/testimonials',
+      icon: <TeamOutlined />,
+      label: 'Testimonials',
+    },
   ];
 
   const handleMenuClick = ({ key }) => {

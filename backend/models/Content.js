@@ -4,7 +4,7 @@ const contentSchema = new mongoose.Schema({
   section: { 
     type: String, 
     required: true, 
-    enum: ['home', 'about', 'contact'],
+    enum: ['home', 'about', 'contact', 'services', 'portfolio', 'blog'],
     unique: true 
   },
   content: {

@@ -1,37 +1,60 @@
 import { motion } from 'framer-motion';
 import { Container, Row, Col, Card } from 'react-bootstrap';
 import { Users, Award, Target, CheckCircle, Star, TrendingUp, Shield, Zap } from 'lucide-react';
+import { useContent } from '../context/ContentContext';
 
 const About = () => {
+  const { content: dynamicContent, loading } = useContent();
+  const content = dynamicContent.about || {};
+
   const stats = [
-    { number: '500+', label: 'Happy Clients', icon: Users },
-    { number: '1000+', label: 'Projects Completed', icon: Award },
-    { number: '10+', label: 'Years Experience', icon: Target },
-    { number: '99%', label: 'Client Satisfaction', icon: Star }
+    { number: content.stat1Number || '500+', label: content.stat1Label || 'Happy Clients', icon: Users },
+    { number: content.stat2Number || '1000+', label: content.stat2Label || 'Projects Completed', icon: Award },
+    { number: content.stat3Number || '10+', label: content.stat3Label || 'Years Experience', icon: Target },
+    { number: content.stat4Number || '99%', label: content.stat4Label || 'Client Satisfaction', icon: Star }
   ];
 
   const values = [
     {
       icon: Shield,
-      title: 'Trust & Reliability',
-      description: 'We build lasting relationships through transparent communication and reliable delivery.'
+      title: content.value1Title || 'Trust & Reliability',
+      description: content.value1Description || 'We build lasting relationships through transparent communication and reliable delivery.'
     },
     {
       icon: Zap,
-      title: 'Innovation First',
-      description: 'We stay ahead of technology trends to provide cutting-edge solutions for our clients.'
+      title: content.value2Title || 'Innovation First',
+      description: content.value2Description || 'We stay ahead of technology trends to provide cutting-edge solutions for our clients.'
     },
     {
       icon: Target,
-      title: 'Results Driven',
-      description: 'Every project is measured by its impact on your business growth and success metrics.'
+      title: content.value3Title || 'Results Driven',
+      description: content.value3Description || 'Every project is measured by its impact on your business growth and success metrics.'
     },
     {
       icon: Users,
-      title: 'Client Focused',
-      description: 'Your success is our success. We work as an extension of your team to achieve your goals.'
+      title: content.value4Title || 'Client Focused',
+      description: content.value4Description || 'Your success is our success. We work as an extension of your team to achieve your goals.'
     }
   ];
+
+  if (loading) {
+    return (
+      <div style={{ 
+        minHeight: '100vh', 
+        display: 'flex', 
+        alignItems: 'center', 
+        justifyContent: 'center',
+        paddingTop: '140px'
+      }}>
+        <div className="text-center">
+          <div className="spinner-border text-primary" role="status" style={{ width: '3rem', height: '3rem' }}>
+            <span className="visually-hidden">Loading...</span>
+          </div>
+          <p style={{ marginTop: '1rem', color: '#6b7280' }}>Loading...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div style={{ minHeight: '100vh' }}>
@@ -80,7 +103,7 @@ const About = () => {
                 transition={{ delay: 0.3 }}
               >
                 <Award size={16} style={{ marginRight: '0.5rem', color: '#fbbf24' }} />
-                Trusted Digital Partner Since 2014
+                {content.heroBadgeText || 'Trusted Digital Partner Since 2014'}
               </motion.div>
               
               <h1 style={{
@@ -90,14 +113,12 @@ const About = () => {
                 fontFamily: 'Poppins, sans-serif',
                 lineHeight: '1.1'
               }}>
-                About 
+                About
                 <span style={{
                   background: 'linear-gradient(135deg, #3b82f6, #8b5cf6)',
                   WebkitBackgroundClip: 'text',
                   WebkitTextFillColor: 'transparent'
-                }}>
-                  Roof Biz Solutions
-                </span>
+                }}>1Roof Biz Solution</span> 
               </h1>
               <p style={{
                 fontSize: 'clamp(1rem, 2.5vw, 1.25rem)',
@@ -106,7 +127,7 @@ const About = () => {
                 margin: '0 auto',
                 lineHeight: '1.7'
               }}>
-                We're a team of passionate professionals dedicated to transforming businesses through innovative digital solutions that drive real results.
+                {content.heroSubtitle || "We're a team of passionate professionals dedicated to transforming businesses through innovative digital solutions that drive real results."}
               </p>
             </motion.div>
           </div>
@@ -184,15 +205,14 @@ const About = () => {
                   marginBottom: '2rem',
                   color: '#1f2937',
                   fontFamily: 'Poppins, sans-serif'
-                }}>Our Story</h2>
+                }}>{content.storyTitle || 'Our Story'}</h2>
                 <p style={{
                   color: '#4b5563',
                   marginBottom: '1.5rem',
                   fontSize: 'clamp(1rem, 2.2vw, 1.1rem)',
                   lineHeight: '1.7'
                 }}>
-                  Founded with a vision to bridge the gap between innovative technology and business success, 
-                  Roof Biz Solutions has been at the forefront of digital transformation for over a decade.
+                  {content.storyDescription1 || 'Founded with a vision to bridge the gap between innovative technology and business success, Roof Biz Solutions has been at the forefront of digital transformation for over a decade.'}
                 </p>
                 <p style={{
                   color: '#4b5563',
@@ -200,17 +220,16 @@ const About = () => {
                   fontSize: '1.1rem',
                   lineHeight: '1.7'
                 }}>
-                  We believe that every business deserves access to cutting-edge digital solutions that drive 
-                  growth, enhance customer experience, and create lasting value.
+                  {content.storyDescription2 || 'We believe that every business deserves access to cutting-edge digital solutions that drive growth, enhance customer experience, and create lasting value.'}
                 </p>
                 
                 {/* Key Points */}
                 <div>
                   {[
-                    'Expert team with 10+ years experience',
-                    'Proven track record of successful projects',
-                    'Cutting-edge technology solutions',
-                    'Dedicated support and maintenance'
+                    content.storyPoint1 || 'Expert team with 10+ years experience',
+                    content.storyPoint2 || 'Proven track record of successful projects',
+                    content.storyPoint3 || 'Cutting-edge technology solutions',
+                    content.storyPoint4 || 'Dedicated support and maintenance'
                   ].map((point, index) => (
                     <motion.div 
                       key={index}
@@ -290,13 +309,13 @@ const About = () => {
               marginBottom: '1rem',
               color: '#1f2937',
               fontFamily: 'Poppins, sans-serif'
-            }}>Our Core Values</h2>
+            }}>{content.valuesTitle || 'Our Core Values'}</h2>
             <p style={{
               fontSize: 'clamp(1rem, 2.5vw, 1.2rem)',
               color: '#6b7280',
               maxWidth: '600px',
               margin: '0 auto'
-            }}>The principles that guide everything we do</p>
+            }}>{content.valuesSubtitle || 'The principles that guide everything we do'}</p>
           </motion.div>
           
           <Row>

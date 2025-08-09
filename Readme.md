@@ -1,4 +1,4 @@
-# Roof Biz Solutions - Full Stack Website
+# 1roofBizSolution - Full Stack Website
 
 A modern, professional digital agency website built with React.js and Express.js.
 
@@ -88,13 +88,13 @@ npm run dev
 
 ## Default Admin Credentials
 
-- Email: admin@roofbizsolutions.com
+- Email: admin@1roofbizsolution.com
 - Password: admin123
 
 ## Project Structure
 
 ```
-roof-biz-solutions/
+1roofbizsolution/
 ├── backend/
 │   ├── models/          # MongoDB models
 │   ├── routes/          # API routes

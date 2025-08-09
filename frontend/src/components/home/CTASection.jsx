@@ -3,7 +3,7 @@ import { motion } from 'framer-motion';
 import { Container, Row, Col, Button } from 'react-bootstrap';
 import { ArrowRight, MessageCircle, Calendar, Phone, Mail } from 'lucide-react';
 
-const CTASection = () => {
+const CTASection = ({ content = {} }) => {
   const contactMethods = [
     {
       icon: Phone,
@@ -133,7 +133,7 @@ const CTASection = () => {
                 fontFamily: 'Poppins, sans-serif',
                 lineHeight: '1.1'
               }}>
-                Transform Your Business
+                {content.ctaTitle || 'Ready to Transform Your Business?'}
                 <span style={{
                   background: 'linear-gradient(135deg, #3b82f6, #8b5cf6, #06b6d4)',
                   WebkitBackgroundClip: 'text',
@@ -151,7 +151,7 @@ const CTASection = () => {
                 lineHeight: '1.7',
                 maxWidth: '500px'
               }}>
-                Let's discuss how we can help you achieve your digital goals and drive measurable results for your business.
+                {content.ctaSubtitle || "Let's discuss your project and create something amazing together."}
               </p>
 
               <div className="d-flex flex-column flex-sm-row gap-3">

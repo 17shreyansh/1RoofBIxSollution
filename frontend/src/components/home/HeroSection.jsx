@@ -4,7 +4,7 @@ import { motion } from 'framer-motion';
 import { Container, Row, Col, Button } from 'react-bootstrap';
 import { ArrowRight, Play, CheckCircle, Star, Users, Award, TrendingUp } from 'lucide-react';
 
-const HeroSection = () => {
+const HeroSection = ({ content = {} }) => {
   const [isLoaded, setIsLoaded] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
 
@@ -113,7 +113,7 @@ const HeroSection = () => {
                 transition={{ delay: 0.3 }}
               >
                 <Star size={16} style={{ marginRight: '0.5rem', color: '#fbbf24', fill: '#fbbf24' }} />
-                Trusted by 500+ Businesses Worldwide
+                {content.heroBadgeText || 'Trusted by 500+ Businesses Worldwide'}
               </motion.div>
 
               {/* Main Headline */}
@@ -129,7 +129,7 @@ const HeroSection = () => {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.5, duration: 0.8 }}
               >
-                Transform Your Business with
+                {content.heroMainTitle || 'Transform Your Business with'}
                 <span style={{
                   background: 'linear-gradient(135deg, #3b82f6, #8b5cf6, #06b6d4)',
                   WebkitBackgroundClip: 'text',
@@ -137,7 +137,7 @@ const HeroSection = () => {
                   display: 'block',
                   marginTop: '0.5rem'
                 }}>
-                  Digital Excellence
+                  {content.heroHighlightTitle || 'Digital Excellence'}
                 </span>
               </motion.h1>
 
@@ -154,7 +154,7 @@ const HeroSection = () => {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ delay: 0.7, duration: 0.8 }}
               >
-                We help businesses grow through innovative web development, digital marketing, and strategic consulting solutions that deliver measurable results.
+                {content.heroSubtitle || 'We help businesses grow through innovative web development, digital marketing, and strategic consulting solutions that deliver measurable results.'}
               </motion.p>
 
               {/* Key Benefits */}
@@ -165,9 +165,9 @@ const HeroSection = () => {
                 transition={{ delay: 0.9, duration: 0.8 }}
               >
                 {[
-                  'Custom Web Development & Design',
-                  'Data-Driven Digital Marketing',
-                  'Strategic Business Consulting'
+                  content.heroBenefit1 || 'Custom Web Development & Design',
+                  content.heroBenefit2 || 'Data-Driven Digital Marketing',
+                  content.heroBenefit3 || 'Strategic Business Consulting'
                 ].map((benefit, index) => (
                   <motion.div 
                     key={index} 
@@ -231,7 +231,7 @@ const HeroSection = () => {
                     e.target.style.boxShadow = '0 10px 30px rgba(59, 130, 246, 0.4)';
                   }}
                 >
-                  Get Started Today
+                  {content.heroCTAButton || 'Get Started Today'}
                   <ArrowRight size={20} style={{ marginLeft: '0.5rem' }} />
                 </Button>
 
@@ -261,7 +261,7 @@ const HeroSection = () => {
                   }}
                 >
                   <Play size={18} style={{ marginRight: '0.5rem' }} />
-                  Watch Demo
+                  {content.heroSecondaryButton || 'Watch Demo'}
                 </Button>
               </motion.div>
             </motion.div>

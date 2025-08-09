@@ -19,177 +19,7 @@ const PortfolioDetail = () => {
   const { slug } = useParams();
   const [project, setProject] = useState(null);
   const [loading, setLoading] = useState(true);
-
-  // Comprehensive mock data
-  const mockProjects = {
-    'ecommerce-platform': {
-      title: 'E-commerce Platform',
-      slug: 'ecommerce-platform',
-      description: 'A comprehensive e-commerce solution built for a growing retail business. The platform features advanced inventory management, multiple payment gateways, and a responsive design that works seamlessly across all devices.',
-      shortDescription: 'Modern online store with advanced features',
-      image: '/api/placeholder/1200/600',
-      gallery: [
-        '/api/placeholder/800/500',
-        '/api/placeholder/800/500',
-        '/api/placeholder/800/500',
-        '/api/placeholder/800/500'
-      ],
-      category: 'Web Development',
-      services: ['Web Development', 'E-commerce', 'UI/UX Design'],
-      client: {
-        name: 'RetailMax Solutions',
-        logo: '/api/placeholder/200/100',
-        website: 'https://retailmax.com'
-      },
-      projectUrl: 'https://demo-ecommerce.com',
-      technologies: ['React.js', 'Node.js', 'MongoDB', 'Stripe', 'AWS', 'Redux'],
-      duration: '3 months',
-      completedDate: 'March 2024',
-      results: {
-        metrics: [
-          { label: 'Sales Increase', value: '250%', improvement: '+150%' },
-          { label: 'Page Load Speed', value: '1.2s', improvement: '60% faster' },
-          { label: 'Mobile Conversion', value: '8.5%', improvement: '+200%' },
-          { label: 'User Engagement', value: '4.2 min', improvement: '+180%' }
-        ],
-        testimonial: 'The new platform exceeded our expectations. Sales have tripled since launch!'
-      },
-      challenges: [
-        'Complex inventory management system',
-        'Multiple payment gateway integration',
-        'Real-time order tracking',
-        'Mobile-first responsive design'
-      ],
-      solutions: [
-        'Custom inventory API with real-time updates',
-        'Unified payment processing system',
-        'WebSocket-based live tracking',
-        'Progressive Web App architecture'
-      ],
-      features: [
-        'Advanced product catalog',
-        'Multi-vendor support',
-        'Real-time inventory tracking',
-        'Secure payment processing',
-        'Order management system',
-        'Customer analytics dashboard',
-        'Mobile-responsive design',
-        'SEO optimization'
-      ]
-    },
-    'brand-identity': {
-      title: 'Brand Identity Design',
-      slug: 'brand-identity',
-      description: 'Complete brand transformation for a tech startup, including logo design, brand guidelines, marketing materials, and digital assets. The project focused on creating a modern, professional identity that resonates with their target audience.',
-      shortDescription: 'Complete brand redesign and visual identity',
-      image: '/api/placeholder/1200/600',
-      gallery: [
-        '/api/placeholder/800/500',
-        '/api/placeholder/800/500',
-        '/api/placeholder/800/500',
-        '/api/placeholder/800/500'
-      ],
-      category: 'Design',
-      services: ['Brand Design', 'Logo Design', 'Marketing Materials'],
-      client: {
-        name: 'TechVision Startup',
-        logo: '/api/placeholder/200/100',
-        website: 'https://techvision.com'
-      },
-      projectUrl: null,
-      technologies: ['Figma', 'Adobe Illustrator', 'Photoshop', 'InDesign'],
-      duration: '6 weeks',
-      completedDate: 'February 2024',
-      results: {
-        metrics: [
-          { label: 'Brand Recognition', value: '85%', improvement: '+300%' },
-          { label: 'Customer Trust', value: '92%', improvement: '+180%' },
-          { label: 'Market Position', value: 'Top 10', improvement: 'From unranked' },
-          { label: 'Social Engagement', value: '450%', improvement: '+350%' }
-        ],
-        testimonial: 'Our new brand identity perfectly captures our vision and has significantly improved our market presence.'
-      },
-      challenges: [
-        'Outdated visual identity',
-        'Inconsistent brand messaging',
-        'Limited market recognition',
-        'Competitive differentiation'
-      ],
-      solutions: [
-        'Modern, scalable logo design',
-        'Comprehensive brand guidelines',
-        'Consistent visual language',
-        'Unique brand positioning strategy'
-      ],
-      features: [
-        'Logo design and variations',
-        'Brand color palette',
-        'Typography system',
-        'Brand guidelines document',
-        'Business card design',
-        'Letterhead and stationery',
-        'Social media templates',
-        'Website design elements'
-      ]
-    },
-    'mobile-app': {
-      title: 'Mobile Banking App',
-      slug: 'mobile-app',
-      description: 'A secure and user-friendly mobile banking application with advanced features like biometric authentication, real-time transactions, and comprehensive financial management tools.',
-      shortDescription: 'Secure and user-friendly banking application',
-      image: '/api/placeholder/1200/600',
-      gallery: [
-        '/api/placeholder/800/500',
-        '/api/placeholder/800/500',
-        '/api/placeholder/800/500',
-        '/api/placeholder/800/500'
-      ],
-      category: 'Mobile',
-      services: ['Mobile Development', 'UI/UX Design', 'Security'],
-      client: {
-        name: 'SecureBank Corp',
-        logo: '/api/placeholder/200/100',
-        website: 'https://securebank.com'
-      },
-      projectUrl: null,
-      technologies: ['React Native', 'Firebase', 'Stripe', 'Biometric API', 'Redux'],
-      duration: '4 months',
-      completedDate: 'April 2024',
-      results: {
-        metrics: [
-          { label: 'App Store Rating', value: '4.8/5', improvement: 'New app' },
-          { label: 'Daily Active Users', value: '25K+', improvement: 'New metric' },
-          { label: 'Transaction Success', value: '99.9%', improvement: 'Industry leading' },
-          { label: 'User Satisfaction', value: '94%', improvement: 'Excellent' }
-        ],
-        testimonial: 'The app has revolutionized how our customers interact with our banking services.'
-      },
-      challenges: [
-        'High security requirements',
-        'Complex financial regulations',
-        'Cross-platform compatibility',
-        'Real-time transaction processing'
-      ],
-      solutions: [
-        'Multi-layer security architecture',
-        'Compliance-first development',
-        'React Native framework',
-        'Real-time API integration'
-      ],
-      features: [
-        'Biometric authentication',
-        'Real-time balance updates',
-        'Secure money transfers',
-        'Bill payment system',
-        'Transaction history',
-        'Budget tracking tools',
-        'Push notifications',
-        'Customer support chat'
-      ]
-    }
-  };
-
-  const mockProject = mockProjects[slug] || mockProjects['ecommerce-platform'];
+  const [error, setError] = useState(null);
 
   useEffect(() => {
     fetchProject();
@@ -198,11 +28,12 @@ const PortfolioDetail = () => {
   const fetchProject = async () => {
     try {
       setLoading(true);
-      // For now, use mock data
-      setProject(mockProject);
+      setError(null);
+      const response = await api.get(`/portfolio/${slug}`);
+      setProject(response.data);
     } catch (error) {
       console.error('Error fetching project:', error);
-      setProject(mockProject);
+      setError('Project not found');
     } finally {
       setLoading(false);
     }
@@ -386,18 +217,22 @@ const PortfolioDetail = () => {
               zIndex: 10
             }}
           >
-            <img 
-              src={project.image} 
-              alt={project.title}
-              style={{
-                width: '100%',
-                height: '500px',
-                objectFit: 'cover'
-              }}
-            />
+            {project.image && (
+              <img 
+                src={project.image} 
+                alt={project.title}
+                style={{
+                  width: '100%',
+                  height: '500px',
+                  objectFit: 'cover'
+                }}
+              />
+            )}
           </motion.div>
         </Container>
       </section>
+
+  
 
       {/* Results Section */}
       <section style={{ padding: '5rem 0', background: '#f8fafc' }}>
@@ -579,6 +414,59 @@ const PortfolioDetail = () => {
           </Row>
         </Container>
       </section>
+
+          {/* Gallery Section */}
+      {project.gallery && project.gallery.length > 0 && (
+        <section style={{ padding: '5rem 0', background: 'white' }}>
+          <Container>
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              className="text-center mb-5"
+            >
+              <h2 style={{
+                fontSize: 'clamp(1.8rem, 4vw, 2.5rem)',
+                fontWeight: '900',
+                marginBottom: '1rem',
+                color: '#1f2937',
+                fontFamily: 'Poppins, sans-serif'
+              }}>Project Gallery</h2>
+            </motion.div>
+            
+            <Row>
+              {project.gallery.map((image, index) => (
+                <Col key={index} md={6} lg={4} className="mb-4">
+                  <motion.div
+                    initial={{ opacity: 0, y: 20 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ delay: index * 0.1 }}
+                    style={{
+                      borderRadius: '15px',
+                      overflow: 'hidden',
+                      boxShadow: '0 10px 30px rgba(0, 0, 0, 0.1)',
+                      cursor: 'pointer',
+                      transition: 'transform 0.3s ease'
+                    }}
+                    whileHover={{ scale: 1.05 }}
+                  >
+                    <img 
+                      src={image} 
+                      alt={`${project.title} - Gallery ${index + 1}`}
+                      style={{
+                        width: '100%',
+                        height: '250px',
+                        objectFit: 'cover'
+                      }}
+                    />
+                  </motion.div>
+                </Col>
+              ))}
+            </Row>
+          </Container>
+        </section>
+      )}
 
       {/* CTA Section */}
       <section style={{

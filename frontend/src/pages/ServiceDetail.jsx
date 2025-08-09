@@ -16,6 +16,7 @@ import {
   ArrowRight
 } from 'lucide-react';
 import api from '../utils/api';
+import { formatPrice } from '../utils/currency';
 
 const ServiceDetail = () => {
   const { slug } = useParams();
@@ -23,279 +24,7 @@ const ServiceDetail = () => {
   const [loading, setLoading] = useState(true);
   const [selectedPlan, setSelectedPlan] = useState('standard');
 
-  // Comprehensive mock data based on slug
-  const mockServices = {
-    'web-development': {
-      name: 'Web Development',
-      slug: 'web-development',
-      description: 'Transform your digital presence with cutting-edge web development solutions. We create responsive, fast, and user-friendly websites that drive results and engage your audience.',
-      shortDescription: 'Custom websites and web applications built with modern technologies',
-      image: '/api/placeholder/800/400',
-      features: [
-        'Responsive Design',
-        'Modern Frameworks (React, Vue, Angular)',
-        'SEO Optimized',
-        'Fast Loading Speed',
-        'Mobile-First Approach',
-        'Cross-Browser Compatibility',
-        'Security Best Practices',
-        'Performance Optimization'
-      ],
-      technologies: ['React.js', 'Node.js', 'MongoDB', 'Express.js', 'HTML5', 'CSS3', 'JavaScript'],
-      pricing: {
-        basic: {
-          price: 2999,
-          features: [
-            'Up to 5 pages',
-            'Responsive design',
-            'Basic SEO setup',
-            'Contact form',
-            '3 months support',
-            'Basic analytics'
-          ]
-        },
-        standard: {
-          price: 4999,
-          features: [
-            'Up to 10 pages',
-            'Advanced responsive design',
-            'Complete SEO optimization',
-            'Multiple contact forms',
-            'Blog functionality',
-            '6 months support',
-            'Advanced analytics',
-            'Social media integration'
-          ]
-        },
-        premium: {
-          price: 7999,
-          features: [
-            'Unlimited pages',
-            'Custom functionality',
-            'E-commerce integration',
-            'Advanced SEO & marketing',
-            'Custom CMS',
-            '12 months support',
-            'Priority support',
-            'Performance monitoring',
-            'Security monitoring'
-          ]
-        }
-      },
-      deliveryTime: '2-4 weeks',
-      category: 'Development',
-      benefits: [
-        {
-          icon: Zap,
-          title: 'Lightning Fast',
-          description: 'Optimized for speed with modern technologies and best practices'
-        },
-        {
-          icon: Shield,
-          title: 'Secure & Reliable',
-          description: 'Built with security in mind using industry-standard practices'
-        },
-        {
-          icon: TrendingUp,
-          title: 'SEO Optimized',
-          description: 'Designed to rank well in search engines from day one'
-        },
-        {
-          icon: Users,
-          title: 'User-Centered',
-          description: 'Focused on providing exceptional user experience'
-        }
-      ],
-      process: [
-        {
-          step: 1,
-          title: 'Discovery & Planning',
-          description: 'We analyze your requirements and create a detailed project plan'
-        },
-        {
-          step: 2,
-          title: 'Design & Prototyping',
-          description: 'Create wireframes and visual designs for your approval'
-        },
-        {
-          step: 3,
-          title: 'Development',
-          description: 'Build your website using modern technologies and best practices'
-        },
-        {
-          step: 4,
-          title: 'Testing & Launch',
-          description: 'Thorough testing and deployment to your hosting environment'
-        }
-      ],
-      testimonials: [
-        {
-          name: 'Sarah Johnson',
-          company: 'TechStart Inc.',
-          rating: 5,
-          text: 'Outstanding work! The team delivered exactly what we needed and more.'
-        },
-        {
-          name: 'Mike Chen',
-          company: 'Digital Solutions',
-          rating: 5,
-          text: 'Professional, timely, and exceeded our expectations. Highly recommended!'
-        }
-      ],
-      portfolio: [
-        { title: 'E-commerce Platform', image: '/api/placeholder/300/200', url: '#' },
-        { title: 'Corporate Website', image: '/api/placeholder/300/200', url: '#' },
-        { title: 'SaaS Dashboard', image: '/api/placeholder/300/200', url: '#' }
-      ],
-      faqs: [
-        {
-          question: 'What technologies do you use?',
-          answer: 'We use modern technologies like React.js, Node.js, and MongoDB to ensure your website is fast, secure, and scalable.'
-        },
-        {
-          question: 'How long does development take?',
-          answer: 'Typical projects take 2-4 weeks depending on complexity and requirements.'
-        },
-        {
-          question: 'Do you provide ongoing support?',
-          answer: 'Yes, we provide 3-12 months of support depending on your chosen package.'
-        }
-      ]
-    },
-    'digital-marketing': {
-      name: 'Digital Marketing',
-      slug: 'digital-marketing',
-      description: 'Boost your online presence with comprehensive digital marketing strategies. We help businesses grow through SEO, PPC, social media, and content marketing.',
-      shortDescription: 'Comprehensive digital marketing strategies to grow your business',
-      image: '/api/placeholder/800/400',
-      features: [
-        'SEO Optimization',
-        'PPC Campaigns',
-        'Social Media Marketing',
-        'Content Marketing',
-        'Email Marketing',
-        'Analytics & Reporting',
-        'Conversion Optimization',
-        'Brand Management'
-      ],
-      technologies: ['Google Ads', 'Facebook Ads', 'Google Analytics', 'SEMrush', 'Mailchimp', 'Hootsuite'],
-      pricing: {
-        basic: {
-          price: 1499,
-          features: [
-            'Basic SEO audit',
-            'Social media setup',
-            'Monthly reporting',
-            '2 blog posts/month',
-            'Email support'
-          ]
-        },
-        standard: {
-          price: 2999,
-          features: [
-            'Complete SEO optimization',
-            'PPC campaign management',
-            'Social media management',
-            '4 blog posts/month',
-            'Weekly reporting',
-            'Phone support'
-          ]
-        },
-        premium: {
-          price: 4999,
-          features: [
-            'Full marketing strategy',
-            'Multi-platform campaigns',
-            'Content creation',
-            '8 blog posts/month',
-            'Daily monitoring',
-            'Dedicated account manager'
-          ]
-        }
-      },
-      deliveryTime: 'Ongoing monthly service',
-      category: 'Marketing',
-      benefits: [
-        {
-          icon: TrendingUp,
-          title: 'Increased Traffic',
-          description: 'Drive more qualified visitors to your website'
-        },
-        {
-          icon: Users,
-          title: 'Better Engagement',
-          description: 'Connect with your audience across all platforms'
-        },
-        {
-          icon: Award,
-          title: 'Proven Results',
-          description: 'Data-driven strategies that deliver measurable ROI'
-        },
-        {
-          icon: Zap,
-          title: 'Quick Implementation',
-          description: 'Fast setup and immediate campaign optimization'
-        }
-      ],
-      process: [
-        {
-          step: 1,
-          title: 'Strategy Development',
-          description: 'Analyze your market and create a comprehensive marketing strategy'
-        },
-        {
-          step: 2,
-          title: 'Campaign Setup',
-          description: 'Set up and optimize campaigns across chosen platforms'
-        },
-        {
-          step: 3,
-          title: 'Content Creation',
-          description: 'Develop engaging content that resonates with your audience'
-        },
-        {
-          step: 4,
-          title: 'Monitor & Optimize',
-          description: 'Continuous monitoring and optimization for best results'
-        }
-      ],
-      testimonials: [
-        {
-          name: 'David Wilson',
-          company: 'Local Business Co.',
-          rating: 5,
-          text: 'Our online visibility increased by 300% in just 3 months!'
-        },
-        {
-          name: 'Lisa Brown',
-          company: 'Retail Plus',
-          rating: 5,
-          text: 'The ROI on our marketing spend has never been better.'
-        }
-      ],
-      portfolio: [
-        { title: 'E-commerce Growth Campaign', image: '/api/placeholder/300/200', url: '#' },
-        { title: 'Local SEO Success', image: '/api/placeholder/300/200', url: '#' },
-        { title: 'Social Media Transformation', image: '/api/placeholder/300/200', url: '#' }
-      ],
-      faqs: [
-        {
-          question: 'How quickly will I see results?',
-          answer: 'SEO results typically take 3-6 months, while PPC and social media can show results within weeks.'
-        },
-        {
-          question: 'What platforms do you work with?',
-          answer: 'We work with Google, Facebook, Instagram, LinkedIn, Twitter, and other major platforms.'
-        },
-        {
-          question: 'Do you provide detailed reporting?',
-          answer: 'Yes, we provide comprehensive monthly reports with all key metrics and insights.'
-        }
-      ]
-    }
-  };
-  
-  const mockService = mockServices[slug] || mockServices['web-development'];
+
 
   useEffect(() => {
     fetchService();
@@ -304,11 +33,22 @@ const ServiceDetail = () => {
   const fetchService = async () => {
     try {
       setLoading(true);
-      // For now, use mock data
-      setService(mockService);
+      const response = await api.get(`/services/${slug}`);
+      const serviceData = response.data;
+      
+      // Add default benefits if not present
+      if (!serviceData.benefits) {
+        serviceData.benefits = [
+          { icon: Zap, title: 'Fast Delivery', description: 'Quick turnaround time with quality results' },
+          { icon: Shield, title: 'Reliable', description: 'Dependable service you can trust' },
+          { icon: TrendingUp, title: 'Results Driven', description: 'Focused on achieving your business goals' },
+          { icon: Users, title: 'Expert Team', description: 'Experienced professionals dedicated to your success' }
+        ];
+      }
+      
+      setService(serviceData);
     } catch (error) {
       console.error('Error fetching service:', error);
-      setService(mockService);
     } finally {
       setLoading(false);
     }
@@ -607,7 +347,7 @@ const ServiceDetail = () => {
                         color: '#3b82f6',
                         marginBottom: '0.5rem'
                       }}>
-                        ${plan.price?.toLocaleString()}
+                        {formatPrice(plan.price)}
                       </div>
                       <p style={{ color: '#6b7280', fontSize: '0.9rem' }}>
                         One-time payment

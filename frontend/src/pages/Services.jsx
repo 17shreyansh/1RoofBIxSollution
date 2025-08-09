@@ -4,111 +4,48 @@ import { Container, Row, Col, Card, Button, Badge } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
 import { ArrowRight, Code, Megaphone, Palette, ShoppingCart, Smartphone, Users, Star, CheckCircle } from 'lucide-react';
 import api from '../utils/api';
+import { useContent } from '../context/ContentContext';
+import { formatPrice } from '../utils/currency';
 
 const Services = () => {
   const [services, setServices] = useState([]);
   const [loading, setLoading] = useState(true);
+  const { content: dynamicContent, loading: contentLoading } = useContent();
+  const content = dynamicContent.services || {};
   
-  // Enhanced services with better mock data
-  const defaultServices = [
-    { 
-      _id: '1', 
-      name: 'Web Development', 
-      description: 'Transform your digital presence with cutting-edge web development solutions. We create responsive, fast, and user-friendly websites that drive results.', 
-      slug: 'web-development',
-      icon: Code,
-      features: ['Responsive Design', 'Modern Frameworks', 'SEO Optimized', 'Fast Loading', 'Security Best Practices'],
-      pricing: { standard: { price: 4999 } },
-      category: 'Development',
-      deliveryTime: '2-4 weeks'
-    },
-    { 
-      _id: '2', 
-      name: 'Digital Marketing', 
-      description: 'Boost your online presence with comprehensive digital marketing strategies. We help businesses grow through SEO, PPC, and social media.', 
-      slug: 'digital-marketing',
-      icon: Megaphone,
-      features: ['SEO Optimization', 'PPC Campaigns', 'Social Media', 'Content Marketing', 'Analytics & Reporting'],
-      pricing: { standard: { price: 2999 } },
-      category: 'Marketing',
-      deliveryTime: 'Ongoing'
-    },
-    { 
-      _id: '3', 
-      name: 'Brand Design', 
-      description: 'Create a memorable brand identity that stands out. Complete brand design including logos, guidelines, and marketing materials.', 
-      slug: 'brand-design',
-      icon: Palette,
-      features: ['Logo Design', 'Brand Guidelines', 'Marketing Materials', 'Visual Identity', 'Brand Strategy'],
-      pricing: { standard: { price: 1999 } },
-      category: 'Design',
-      deliveryTime: '1-2 weeks'
-    },
-    { 
-      _id: '4', 
-      name: 'E-commerce Solutions', 
-      description: 'Build powerful online stores that convert visitors into customers. Full-featured e-commerce with payment integration and management tools.', 
-      slug: 'ecommerce',
-      icon: ShoppingCart,
-      features: ['Payment Integration', 'Inventory Management', 'Mobile Optimized', 'Analytics', 'Security Features'],
-      pricing: { standard: { price: 6999 } },
-      category: 'Development',
-      deliveryTime: '3-6 weeks'
-    },
-    { 
-      _id: '5', 
-      name: 'Mobile App Development', 
-      description: 'Native and cross-platform mobile applications for iOS and Android. Modern features with seamless user experience.', 
-      slug: 'mobile-apps',
-      icon: Smartphone,
-      features: ['iOS & Android', 'Cross-Platform', 'API Integration', 'App Store Deployment', 'Push Notifications'],
-      pricing: { standard: { price: 9999 } },
-      category: 'Development',
-      deliveryTime: '6-12 weeks'
-    },
-    { 
-      _id: '6', 
-      name: 'Business Consulting', 
-      description: 'Strategic technology consulting to optimize your digital transformation. Expert guidance for sustainable business growth.', 
-      slug: 'consulting',
-      icon: Users,
-      features: ['Strategy Planning', 'Technology Audit', 'Process Optimization', 'Growth Planning', 'Implementation Support'],
-      pricing: { standard: { price: 299 } },
-      category: 'Consulting',
-      deliveryTime: 'Flexible'
-    }
-  ];
+  const iconMap = {
+    'web-development': Code,
+    'digital-marketing': Megaphone,
+    'brand-design': Palette,
+    'ecommerce': ShoppingCart,
+    'mobile-apps': Smartphone,
+    'consulting': Users
+  };
 
   useEffect(() => {
-    fetchServices();
+    fetchData();
   }, []);
 
-  const fetchServices = async () => {
+  const fetchData = async () => {
     try {
       setLoading(true);
-      const response = await api.get('/services');
-      if (response.data?.length) {
-        // Map icons to services
-        const servicesWithIcons = response.data.map(service => {
-          const defaultService = defaultServices.find(ds => ds.slug === service.slug);
-          return {
-            ...service,
-            icon: defaultService?.icon || Code
-          };
-        });
-        setServices(servicesWithIcons);
-      } else {
-        setServices(defaultServices);
-      }
+      const servicesRes = await api.get('/services');
+      
+      const servicesData = Array.isArray(servicesRes.data) ? servicesRes.data : [];
+      const servicesWithIcons = servicesData.map(service => ({
+        ...service,
+        icon: iconMap[service.slug] || Code
+      }));
+      setServices(servicesWithIcons);
     } catch (error) {
-      console.error('Error fetching services:', error);
-      setServices(defaultServices);
+      console.error('Error fetching data:', error);
+      setServices([]);
     } finally {
       setLoading(false);
     }
   };
 
-  if (loading) {
+  if (loading || contentLoading) {
     return (
       <div style={{ 
         minHeight: '100vh', 
@@ -174,7 +111,7 @@ const Services = () => {
                 transition={{ delay: 0.3 }}
               >
                 <Star size={16} style={{ marginRight: '0.5rem', color: '#fbbf24', fill: '#fbbf24' }} />
-                Premium Digital Solutions
+                {content.heroBadgeText || 'Premium Digital Solutions'}
               </motion.div>
               
               <h1 style={{
@@ -184,14 +121,11 @@ const Services = () => {
                 fontFamily: 'Poppins, sans-serif',
                 lineHeight: '1.1'
               }}>
-                Our 
-                <span style={{
+                Our<span style={{
                   background: 'linear-gradient(135deg, #3b82f6, #8b5cf6)',
                   WebkitBackgroundClip: 'text',
                   WebkitTextFillColor: 'transparent'
-                }}>
-                  Services
-                </span>
+                }}>Services</span>
               </h1>
               <p style={{
                 fontSize: '1.25rem',
@@ -200,7 +134,7 @@ const Services = () => {
                 margin: '0 auto',
                 lineHeight: '1.7'
               }}>
-                Comprehensive digital solutions designed to transform your business and drive measurable growth.
+                {content.heroSubtitle || 'Comprehensive digital solutions designed to transform your business and drive measurable growth.'}
               </p>
             </motion.div>
           </div>
@@ -222,13 +156,13 @@ const Services = () => {
               marginBottom: '1rem',
               color: '#1f2937',
               fontFamily: 'Poppins, sans-serif'
-            }}>What We Offer</h2>
+            }}>{content.servicesTitle || 'What We Offer'}</h2>
             <p style={{
               fontSize: 'clamp(1rem, 2.5vw, 1.2rem)',
               color: '#6b7280',
               maxWidth: '600px',
               margin: '0 auto'
-            }}>Choose from our comprehensive range of digital services</p>
+            }}>{content.servicesSubtitle || 'Choose from our comprehensive range of digital services'}</p>
           </motion.div>
           
           <Row>
@@ -280,16 +214,18 @@ const Services = () => {
                         }}>
                           {service.name}
                         </h3>
-                        <span style={{
-                          fontSize: 'clamp(0.8rem, 1.8vw, 0.9rem)',
-                          fontWeight: '600',
-                          color: '#3b82f6',
-                          background: 'rgba(59, 130, 246, 0.1)',
-                          padding: '0.25rem 0.75rem',
-                          borderRadius: '20px'
-                        }}>
-                          {service.pricing?.standard?.price ? `$${service.pricing.standard.price.toLocaleString()}` : 'Contact for pricing'}
-                        </span>
+                        {service.price && (
+                          <span style={{
+                            fontSize: 'clamp(0.8rem, 1.8vw, 0.9rem)',
+                            fontWeight: '600',
+                            color: '#3b82f6',
+                            background: 'rgba(59, 130, 246, 0.1)',
+                            padding: '0.25rem 0.75rem',
+                            borderRadius: '20px'
+                          }}>
+                            {formatPrice(service.price)}
+                          </span>
+                        )}
                       </div>
                       
                       <p style={{
@@ -302,44 +238,50 @@ const Services = () => {
                       </p>
                       
                       {/* Features List */}
-                      <div style={{ marginBottom: '2rem' }}>
-                        {(service.features || ['Professional Service', 'Expert Support', 'Quality Guaranteed']).map((feature, i) => (
-                          <div key={i} style={{
-                            display: 'flex',
-                            alignItems: 'center',
-                            marginBottom: '0.5rem',
-                            fontSize: 'clamp(0.8rem, 1.8vw, 0.9rem)',
-                            color: '#374151'
-                          }}>
-                            <CheckCircle size={16} style={{
-                              marginRight: '0.5rem',
-                              color: '#10b981',
-                              flexShrink: 0
-                            }} />
-                            {feature}
-                          </div>
-                        ))}
-                      </div>
+                      {service.features && service.features.length > 0 && (
+                        <div style={{ marginBottom: '2rem' }}>
+                          {service.features.map((feature, i) => (
+                            <div key={i} style={{
+                              display: 'flex',
+                              alignItems: 'center',
+                              marginBottom: '0.5rem',
+                              fontSize: 'clamp(0.8rem, 1.8vw, 0.9rem)',
+                              color: '#374151'
+                            }}>
+                              <CheckCircle size={16} style={{
+                                marginRight: '0.5rem',
+                                color: '#10b981',
+                                flexShrink: 0
+                              }} />
+                              {feature}
+                            </div>
+                          ))}
+                        </div>
+                      )}
                       
                       <div style={{ display: 'flex', gap: '0.5rem', marginBottom: '1rem' }}>
-                        <Badge 
-                          bg="secondary" 
-                          style={{
-                            fontSize: '0.75rem',
-                            padding: '0.25rem 0.5rem'
-                          }}
-                        >
-                          {service.category}
-                        </Badge>
-                        <Badge 
-                          bg="info" 
-                          style={{
-                            fontSize: '0.75rem',
-                            padding: '0.25rem 0.5rem'
-                          }}
-                        >
-                          {service.deliveryTime}
-                        </Badge>
+                        {service.category && (
+                          <Badge 
+                            bg="secondary" 
+                            style={{
+                              fontSize: '0.75rem',
+                              padding: '0.25rem 0.5rem'
+                            }}
+                          >
+                            {service.category}
+                          </Badge>
+                        )}
+                        {service.deliveryTime && (
+                          <Badge 
+                            bg="info" 
+                            style={{
+                              fontSize: '0.75rem',
+                              padding: '0.25rem 0.5rem'
+                            }}
+                          >
+                            {service.deliveryTime}
+                          </Badge>
+                        )}
                       </div>
                       
                       <Button 
@@ -398,14 +340,14 @@ const Services = () => {
               fontWeight: '900',
               marginBottom: '1rem',
               fontFamily: 'Poppins, sans-serif'
-            }}>Ready to Get Started?</h2>
+            }}>{content.ctaTitle || 'Ready to Get Started?'}</h2>
             <p style={{
               fontSize: 'clamp(1rem, 2.5vw, 1.2rem)',
               marginBottom: '2rem',
               color: 'rgba(255, 255, 255, 0.9)',
               maxWidth: '600px',
               margin: '0 auto 2rem'
-            }}>Let's discuss your project and create something amazing together.</p>
+            }}>{content.ctaSubtitle || "Let's discuss your project and create something amazing together."}</p>
             <Button
               as={Link}
               to="/contact"
@@ -429,7 +371,7 @@ const Services = () => {
                 e.target.style.boxShadow = 'none';
               }}
             >
-              Start Your Project
+              {content.ctaButtonText || 'Start Your Project'}
               <ArrowRight size={20} style={{ marginLeft: '0.5rem' }} />
             </Button>
           </motion.div>

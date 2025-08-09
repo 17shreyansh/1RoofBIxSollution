@@ -39,7 +39,7 @@ const seedAll = async () => {
     console.log('👤 Creating admin user...');
     const adminUser = new User({
       name: 'Admin User',
-      email: 'admin@roofbizsolutions.com',
+      email: 'admin@1roofbizsolution.com',
       password: 'admin123',
       role: 'super_admin'
     });
@@ -177,7 +177,7 @@ const seedAll = async () => {
         stat4Label: 'Client Satisfaction'
       },
       about: {
-        heroTitle: 'About Roof Biz Solutions',
+        heroTitle: 'About 1roofBizSolution',
         heroBadgeText: 'Trusted Digital Partner Since 2014',
         heroSubtitle: 'We\'re a team of passionate professionals dedicated to transforming businesses through innovative digital solutions that drive real results.'
       },
@@ -185,9 +185,9 @@ const seedAll = async () => {
         heroTitle: 'Get In Touch',
         heroBadgeText: 'Let\'s Start a Conversation',
         heroSubtitle: 'Ready to transform your business? Let\'s discuss your project and create something amazing together.',
-        email: 'info@roofbizsolutions.com',
-        phone: '+1 (234) 567-890',
-        address: '123 Business St, City, State 12345'
+        email: 'info@1roofbizsolution.com',
+        phone: '+91 98765 43210',
+        address: 'Mumbai, Maharashtra, India'
       }
     };
 
@@ -202,7 +202,7 @@ const seedAll = async () => {
       {
         name: 'John Smith',
         role: 'CEO, TechCorp',
-        content: 'Roof Biz Solutions delivered an exceptional website that exceeded our expectations.',
+        content: '1roofBizSolution delivered an exceptional website that exceeded our expectations.',
         rating: 5,
         isActive: true,
         order: 1
@@ -225,16 +225,49 @@ const seedAll = async () => {
       {
         title: 'The Future of Web Development',
         content: '<p>Web development is evolving rapidly with new technologies and frameworks emerging constantly. In this post, we explore the latest trends shaping the future of web development.</p>',
-        excerpt: 'Exploring the latest trends in web development',
+        excerpt: 'Exploring the latest trends in web development and emerging technologies',
         category: 'Technology',
         tags: ['Web Development', 'Technology', 'Trends'],
-        author: adminUser._id,
+        author: 'Admin User',
+        readTime: 5,
         isPublished: true,
         publishedAt: new Date(),
         seo: {
-          metaTitle: 'The Future of Web Development - Roof Biz Solutions',
+          metaTitle: 'The Future of Web Development - 1roofBizSolution',
           metaDescription: 'Discover the latest trends and technologies shaping the future of web development.',
           keywords: ['web development', 'technology', 'trends', 'future']
+        }
+      },
+      {
+        title: 'Digital Marketing Strategies for 2024',
+        content: '<p>Digital marketing continues to evolve with new platforms, technologies, and consumer behaviors. Learn about the most effective strategies for 2024.</p>',
+        excerpt: 'Discover the most effective digital marketing strategies for the modern business landscape',
+        category: 'Marketing',
+        tags: ['Digital Marketing', 'SEO', 'Social Media'],
+        author: 'Marketing Team',
+        readTime: 7,
+        isPublished: true,
+        publishedAt: new Date(Date.now() - 86400000),
+        seo: {
+          metaTitle: 'Digital Marketing Strategies for 2024',
+          metaDescription: 'Learn about the most effective digital marketing strategies for modern businesses.',
+          keywords: ['digital marketing', 'SEO', 'social media', '2024']
+        }
+      },
+      {
+        title: 'Mobile App Development Best Practices',
+        content: '<p>Creating successful mobile applications requires following industry best practices and staying updated with the latest development trends.</p>',
+        excerpt: 'Essential best practices for developing high-quality mobile applications',
+        category: 'Development',
+        tags: ['Mobile Development', 'React Native', 'Flutter'],
+        author: 'Development Team',
+        readTime: 6,
+        isPublished: true,
+        publishedAt: new Date(Date.now() - 172800000),
+        seo: {
+          metaTitle: 'Mobile App Development Best Practices',
+          metaDescription: 'Learn the essential best practices for developing high-quality mobile applications.',
+          keywords: ['mobile development', 'react native', 'flutter', 'best practices']
         }
       }
     ];
@@ -262,7 +295,7 @@ const seedAll = async () => {
     const pricingPlans = [
       {
         name: 'Starter Website',
-        price: 1500,
+        price: 15000,
         features: ['5 Pages', 'Responsive Design', 'Basic SEO', 'Contact Form'],
         deliveryTime: '2 weeks',
         serviceCategory: 'web-development',
@@ -271,7 +304,7 @@ const seedAll = async () => {
       },
       {
         name: 'Business Website',
-        price: 3000,
+        price: 30000,
         features: ['10 Pages', 'CMS Integration', 'Advanced SEO', 'Analytics'],
         deliveryTime: '3 weeks',
         serviceCategory: 'web-development',

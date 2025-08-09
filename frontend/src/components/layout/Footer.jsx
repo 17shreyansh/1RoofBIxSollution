@@ -29,7 +29,7 @@ const Footer = () => {
         <Row>
           {/* Company Info */}
           <Col lg={3} md={6} className="mb-4">
-            <h3 className="h5 fw-bold mb-3">Roof Biz Solutions</h3>
+            <h3 className="h5 fw-bold mb-3">1roofBizSolution</h3>
             <p style={{ color: '#9ca3af', marginBottom: '1rem' }}>
               We Turn Ideas Into Brands. Brands Into Businesses.
             </p>
@@ -70,15 +70,15 @@ const Footer = () => {
             <div>
               <div className="d-flex align-items-center mb-2">
                 <Mail size={16} style={{ marginRight: '0.75rem' }} />
-                <span style={{ color: '#9ca3af' }}>info@roofbizsolutions.com</span>
+                <span style={{ color: '#9ca3af' }}>info@1roofbizsolution.com</span>
               </div>
               <div className="d-flex align-items-center mb-2">
                 <Phone size={16} style={{ marginRight: '0.75rem' }} />
-                <span style={{ color: '#9ca3af' }}>+1 (234) 567-890</span>
+                <span style={{ color: '#9ca3af' }}>+91 98765 43210</span>
               </div>
               <div className="d-flex align-items-center mb-2">
                 <MapPin size={16} style={{ marginRight: '0.75rem' }} />
-                <span style={{ color: '#9ca3af' }}>123 Business St, City, State 12345</span>
+                <span style={{ color: '#9ca3af' }}>Mumbai, Maharashtra, India</span>
               </div>
             </div>
           </Col>
@@ -87,7 +87,7 @@ const Footer = () => {
         <hr style={{ borderColor: '#374151', margin: '2rem 0 1rem 0' }} />
         <div className="text-center">
           <p style={{ color: '#9ca3af', margin: 0 }}>
-            © 2024 Roof Biz Solutions. All rights reserved.
+            © 2024 1roofBizSolution. All rights reserved.
           </p>
         </div>
       </Container>

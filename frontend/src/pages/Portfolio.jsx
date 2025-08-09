@@ -4,38 +4,56 @@ import { Container, Row, Col, Card, Button, Badge } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
 import { ExternalLink, Github, Star, Filter } from 'lucide-react';
 import api from '../utils/api';
+import { useContent } from '../context/ContentContext';
 
 const Portfolio = () => {
-  const [portfolio, setPortfolio] = useState([
-    { _id: '1', title: 'E-commerce Platform', description: 'Modern online store with advanced features', category: 'Web Development', image: '/api/placeholder/600/400', slug: 'ecommerce-platform', technologies: ['React', 'Node.js', 'MongoDB'] },
-    { _id: '2', title: 'Brand Identity Design', description: 'Complete brand redesign and visual identity', category: 'Design', image: '/api/placeholder/600/400', slug: 'brand-identity', technologies: ['Figma', 'Illustrator', 'Photoshop'] },
-    { _id: '3', title: 'Mobile Banking App', description: 'Secure and user-friendly banking application', category: 'Mobile', image: '/api/placeholder/600/400', slug: 'mobile-app', technologies: ['React Native', 'Firebase', 'Stripe'] },
-    { _id: '4', title: 'Digital Marketing Campaign', description: 'Multi-channel marketing strategy and execution', category: 'Marketing', image: '/api/placeholder/600/400', slug: 'marketing-campaign', technologies: ['Google Ads', 'Facebook', 'Analytics'] },
-    { _id: '5', title: 'Corporate Website', description: 'Professional website with CMS integration', category: 'Web Development', image: '/api/placeholder/600/400', slug: 'website-redesign', technologies: ['WordPress', 'PHP', 'MySQL'] },
-    { _id: '6', title: 'SEO Optimization', description: 'Complete SEO audit and optimization', category: 'SEO', image: '/api/placeholder/600/400', slug: 'seo-optimization', technologies: ['SEMrush', 'Google Search Console', 'Analytics'] }
-  ]);
+  const [portfolio, setPortfolio] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [filter, setFilter] = useState('All');
+  const { content: dynamicContent, loading: contentLoading } = useContent();
+  const content = dynamicContent.portfolio || {};
 
   const categories = ['All', 'Web Development', 'Design', 'Mobile', 'Marketing', 'SEO'];
 
   useEffect(() => {
-    fetchPortfolio();
+    fetchData();
   }, []);
 
-  const fetchPortfolio = async () => {
+  const fetchData = async () => {
     try {
-      const response = await api.get('/portfolio');
-      if (response.data?.length) {
-        setPortfolio(response.data);
-      }
+      setLoading(true);
+      const portfolioRes = await api.get('/portfolio');
+      setPortfolio(portfolioRes.data || []);
     } catch (error) {
-      console.error('Error fetching portfolio:', error);
+      console.error('Error fetching data:', error);
+      setPortfolio([]);
+    } finally {
+      setLoading(false);
     }
   };
 
   const filteredPortfolio = filter === 'All' 
     ? portfolio 
     : portfolio.filter(item => item.category === filter);
+
+  if (loading || contentLoading) {
+    return (
+      <div style={{ 
+        minHeight: '100vh', 
+        display: 'flex', 
+        alignItems: 'center', 
+        justifyContent: 'center',
+        paddingTop: '140px'
+      }}>
+        <div className="text-center">
+          <div className="spinner-border text-primary" role="status" style={{ width: '3rem', height: '3rem' }}>
+            <span className="visually-hidden">Loading...</span>
+          </div>
+          <p style={{ marginTop: '1rem', color: '#6b7280' }}>Loading portfolio...</p>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div style={{ minHeight: '100vh' }}>
@@ -84,7 +102,7 @@ const Portfolio = () => {
                 transition={{ delay: 0.3 }}
               >
                 <Star size={16} style={{ marginRight: '0.5rem', color: '#fbbf24', fill: '#fbbf24' }} />
-                Our Best Work
+                {content.heroBadgeText || 'Our Best Work'}
               </motion.div>
               
               <h1 style={{
@@ -94,14 +112,12 @@ const Portfolio = () => {
                 fontFamily: 'Poppins, sans-serif',
                 lineHeight: '1.1'
               }}>
-                Our 
+                Our
                 <span style={{
                   background: 'linear-gradient(135deg, #3b82f6, #8b5cf6)',
                   WebkitBackgroundClip: 'text',
                   WebkitTextFillColor: 'transparent'
-                }}>
-                  Portfolio
-                </span>
+                }}>Portfolio</span>
               </h1>
               <p style={{
                 fontSize: '1.25rem',
@@ -110,7 +126,7 @@ const Portfolio = () => {
                 margin: '0 auto',
                 lineHeight: '1.7'
               }}>
-                Showcasing our best work and the success stories we've created for our clients across various industries.
+                {content.heroSubtitle || "Showcasing our best work and the success stories we've created for our clients across various industries."}
               </p>
             </motion.div>
           </div>

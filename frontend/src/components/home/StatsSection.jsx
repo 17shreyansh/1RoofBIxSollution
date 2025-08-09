@@ -2,7 +2,7 @@ import { Shield, Zap, Target, Heart, Code, Users2, Award, Clock } from 'lucide-r
 import { motion } from 'framer-motion';
 import { Container, Row, Col } from 'react-bootstrap';
 
-const StatsSection = () => {
+const StatsSection = ({ content = {} }) => {
   const capabilities = [
     {
       icon: Shield,
@@ -37,27 +37,27 @@ const StatsSection = () => {
   const achievements = [
     {
       icon: Users2,
-      label: 'Happy Clients',
-      value: '500+',
+      label: content.stat1Label || 'Happy Clients',
+      value: content.stat1Number || '500+',
       description: 'Businesses transformed'
     },
     {
       icon: Code,
-      label: 'Projects Delivered',
-      value: '1000+',
+      label: content.stat2Label || 'Projects Delivered',
+      value: content.stat2Number || '1000+',
       description: 'Successful launches'
     },
     {
       icon: Award,
-      label: 'Success Rate',
-      value: '98%',
-      description: 'Client satisfaction'
+      label: content.stat3Label || 'Success Rate',
+      value: content.stat3Number || '10+',
+      description: 'Years experience'
     },
     {
       icon: Clock,
-      label: 'Support',
-      value: '24/7',
-      description: 'Always available'
+      label: content.stat4Label || 'Support',
+      value: content.stat4Number || '99%',
+      description: 'Client satisfaction'
     }
   ];
 
@@ -108,7 +108,7 @@ const StatsSection = () => {
             viewport={{ once: true }}
             transition={{ delay: 0.2 }}
           >
-            Why Choose Us
+            {content.sectionTitle || 'Why Choose Us'}
           </motion.div>
           
           <h2 style={{
@@ -118,7 +118,7 @@ const StatsSection = () => {
             marginBottom: '1rem',
             fontFamily: 'Poppins, sans-serif'
           }}>
-            Our Approach to Excellence
+            {content.title || 'Our Approach to Excellence'}
           </h2>
           
           <p style={{
@@ -127,7 +127,7 @@ const StatsSection = () => {
             maxWidth: '42rem',
             margin: '0 auto'
           }}>
-            We combine strategic thinking with technical expertise to deliver solutions that drive real business growth
+            {content.description || 'We combine strategic thinking with technical expertise to deliver solutions that drive real business growth'}
           </p>
         </motion.div>
 
@@ -297,7 +297,7 @@ const StatsSection = () => {
             maxWidth: '600px',
             margin: '0 auto'
           }}>
-            Every project is an opportunity to exceed expectations and build lasting partnerships
+            {content.bottomMessage || 'Every project is an opportunity to exceed expectations and build lasting partnerships'}
           </p>
         </motion.div>
       </Container>

@@ -26,6 +26,7 @@ import LinkTool from '@editorjs/link';
 import Delimiter from '@editorjs/delimiter';
 import Table from '@editorjs/table';
 import Embed from '@editorjs/embed';
+import ImageTool from '@editorjs/image';
 import api from '../../utils/api';
 
 const { Title } = Typography;
@@ -127,6 +128,55 @@ const BlogEdit = () => {
               youtube: true,
               coub: true,
               codepen: true,
+            }
+          }
+        },
+        image: {
+          class: ImageTool,
+          config: {
+            uploader: {
+              uploadByFile: async (file) => {
+                console.log('Uploading file:', file.name, file.size);
+                const formData = new FormData();
+                formData.append('image', file);
+                
+                try {
+                  const token = localStorage.getItem('token');
+                  console.log('Token exists:', !!token);
+                  
+                  const response = await fetch('/api/blog/upload-image', {
+                    method: 'POST',
+                    headers: {
+                      'Authorization': `Bearer ${token}`
+                    },
+                    body: formData
+                  });
+                  
+                  console.log('Response status:', response.status);
+                  const data = await response.json();
+                  console.log('Response data:', data);
+                  
+                  if (data.success) {
+                    return {
+                      success: 1,
+                      file: {
+                        url: data.file.url
+                      }
+                    };
+                  } else {
+                    return {
+                      success: 0,
+                      error: data.error || 'Upload failed'
+                    };
+                  }
+                } catch (error) {
+                  console.error('Image upload failed:', error);
+                  return {
+                    success: 0,
+                    error: 'Upload failed'
+                  };
+                }
+              }
             }
           }
         }
