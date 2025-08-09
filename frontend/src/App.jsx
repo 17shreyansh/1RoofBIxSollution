@@ -14,6 +14,9 @@ import PortfolioManager from './components/admin/PortfolioManager';
 import BlogManager from './components/admin/BlogManager';
 import LeadManager from './components/admin/LeadManager';
 import TestimonialManager from './components/admin/TestimonialManager';
+import OrderManager from './components/admin/OrderManager';
+import CustomerManager from './components/admin/CustomerManager';
+import PaymentSettings from './components/admin/PaymentSettings';
 import Home from './pages/Home';
 import About from './pages/About';
 import Services from './pages/Services';
@@ -23,8 +26,14 @@ import PortfolioDetail from './pages/PortfolioDetail';
 import Blog from './pages/Blog';
 import BlogDetail from './pages/BlogDetail';
 import Contact from './pages/Contact';
+import Login from './pages/Login';
+import Signup from './pages/Signup';
 import AdminLogin from './pages/AdminLogin';
+import MyOrders from './pages/MyOrders';
+import OrderDetail from './pages/OrderDetail';
+import Checkout from './pages/Checkout';
 import ProtectedRoute from './components/common/ProtectedRoute';
+import CustomerProtectedRoute from './components/common/CustomerProtectedRoute';
 
 function App() {
   return (
@@ -43,8 +52,15 @@ function App() {
           <Route path="/blog/:slug" element={<Layout><BlogDetail /></Layout>} />
           <Route path="/contact" element={<Layout><Contact /></Layout>} />
           
-          {/* Admin Routes */}
+          {/* Auth Routes */}
+          <Route path="/login" element={<Login />} />
+          <Route path="/signup" element={<Signup />} />
           <Route path="/admin/login" element={<AdminLogin />} />
+          
+          {/* Customer Routes */}
+          <Route path="/checkout/:slug/:packageType" element={<Layout><Checkout /></Layout>} />
+          <Route path="/my-orders" element={<Layout><CustomerProtectedRoute><MyOrders /></CustomerProtectedRoute></Layout>} />
+          <Route path="/order/:orderId" element={<Layout><CustomerProtectedRoute><OrderDetail /></CustomerProtectedRoute></Layout>} />
           <Route path="/admin" element={
             <ProtectedRoute>
               <AdminLayout />
@@ -60,6 +76,9 @@ function App() {
             <Route path="blog" element={<BlogManager />} />
             <Route path="leads" element={<LeadManager />} />
             <Route path="testimonials" element={<TestimonialManager />} />
+            <Route path="orders" element={<OrderManager />} />
+            <Route path="customers" element={<CustomerManager />} />
+            <Route path="settings" element={<PaymentSettings />} />
           </Route>
         </Routes>
         </Router>

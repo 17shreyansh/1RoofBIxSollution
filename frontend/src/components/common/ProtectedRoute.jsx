@@ -4,7 +4,7 @@ import { AuthContext } from '../../context/AuthContext';
 import { Spin } from 'antd';
 
 const ProtectedRoute = ({ children }) => {
-  const { user, loading } = useContext(AuthContext);
+  const { isAdminAuthenticated, loading } = useContext(AuthContext);
 
   if (loading) {
     return (
@@ -19,7 +19,7 @@ const ProtectedRoute = ({ children }) => {
     );
   }
 
-  if (!user) {
+  if (!isAdminAuthenticated) {
     return <Navigate to="/admin/login" replace />;
   }
 

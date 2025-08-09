@@ -1,7 +1,7 @@
 const jwt = require('jsonwebtoken');
-const User = require('../models/User');
+const Customer = require('../models/Customer');
 
-const auth = async (req, res, next) => {
+const customerAuth = async (req, res, next) => {
   try {
     const token = req.header('Authorization')?.replace('Bearer ', '');
     
@@ -11,22 +11,21 @@ const auth = async (req, res, next) => {
 
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
     
-    // Check if it's admin token
-    if (decoded.type && decoded.type !== 'admin') {
-      return res.status(401).json({ message: 'Admin access required' });
+    if (decoded.type !== 'customer') {
+      return res.status(401).json({ message: 'Invalid token type' });
     }
     
-    const user = await User.findById(decoded.id);
+    const customer = await Customer.findById(decoded.id);
     
-    if (!user) {
+    if (!customer) {
       return res.status(401).json({ message: 'Token is not valid' });
     }
 
-    req.user = user;
+    req.customer = customer;
     next();
   } catch (error) {
     res.status(401).json({ message: 'Token is not valid' });
   }
 };
 
-module.exports = auth;
+module.exports = customerAuth;

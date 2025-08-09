@@ -60,14 +60,29 @@ const AdminLayout = () => {
       label: 'Blog',
     },
     {
+      key: '/admin/orders',
+      icon: <ShoppingOutlined />,
+      label: 'Orders',
+    },
+    {
+      key: '/admin/customers',
+      icon: <TeamOutlined />,
+      label: 'Customers',
+    },
+    {
       key: '/admin/leads',
       icon: <ContactsOutlined />,
       label: 'Leads',
     },
     {
       key: '/admin/testimonials',
-      icon: <TeamOutlined />,
+      icon: <UserOutlined />,
       label: 'Testimonials',
+    },
+    {
+      key: '/admin/settings',
+      icon: <DollarOutlined />,
+      label: 'Payment Settings',
     },
   ];
 

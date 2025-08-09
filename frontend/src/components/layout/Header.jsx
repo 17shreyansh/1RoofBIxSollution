@@ -1,8 +1,9 @@
 import { useState, useEffect } from 'react';
 import { Link, useLocation } from 'react-router-dom';
-import { Menu, X, Phone, Mail, ArrowRight, Globe, Code, Users } from 'lucide-react';
+import { Menu, X, Phone, Mail, ArrowRight, Globe, Code, Users, User, LogOut, ShoppingBag, ChevronDown } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Navbar, Nav, Container, Button } from 'react-bootstrap';
+import { Navbar, Nav, Container, Button, Dropdown } from 'react-bootstrap';
+import { useAuth } from '../../context/AuthContext';
 import logo from '../../assets/logo.png';
 
 const Header = () => {
@@ -10,6 +11,7 @@ const Header = () => {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobile, setIsMobile] = useState(false);
   const location = useLocation();
+  const { customer, logout } = useAuth();
 
   useEffect(() => {
     const handleScroll = () => {
@@ -279,12 +281,140 @@ const Header = () => {
                 );
               })}
               
+              {/* User Menu or Auth Links */}
+              {customer ? (
+                <motion.div
+                  initial={{ opacity: 0, scale: 0.8 }}
+                  animate={{ opacity: 1, scale: 1 }}
+                  transition={{ delay: 0.7 }}
+                  style={{ marginLeft: '0.5rem' }}
+                >
+                  <Dropdown align="end">
+                    <Dropdown.Toggle
+                      variant="light"
+                      style={{
+                        background: 'rgba(59, 130, 246, 0.1)',
+                        border: '2px solid rgba(59, 130, 246, 0.2)',
+                        borderRadius: '50px',
+                        padding: 'clamp(0.5rem, 1.5vw, 0.75rem) clamp(1rem, 2.5vw, 1.5rem)',
+                        fontWeight: '600',
+                        fontSize: 'clamp(0.85rem, 1.8vw, 0.95rem)',
+                        color: '#3b82f6',
+                        display: 'flex',
+                        alignItems: 'center',
+                        gap: '0.5rem'
+                      }}
+                    >
+                      <User size={16} />
+                      {customer.name || customer.email.split('@')[0]}
+                    </Dropdown.Toggle>
+
+                    <Dropdown.Menu
+                      style={{
+                        borderRadius: '12px',
+                        border: 'none',
+                        boxShadow: '0 10px 40px rgba(0, 0, 0, 0.15)',
+                        padding: '0.5rem'
+                      }}
+                    >
+                      <Dropdown.Item
+                        as={Link}
+                        to="/my-orders"
+                        style={{
+                          borderRadius: '8px',
+                          padding: '0.75rem 1rem',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '0.5rem',
+                          color: '#374151',
+                          textDecoration: 'none'
+                        }}
+                      >
+                        <ShoppingBag size={16} />
+                        My Orders
+                      </Dropdown.Item>
+                      <Dropdown.Divider />
+                      <Dropdown.Item
+                        onClick={logout}
+                        style={{
+                          borderRadius: '8px',
+                          padding: '0.75rem 1rem',
+                          display: 'flex',
+                          alignItems: 'center',
+                          gap: '0.5rem',
+                          color: '#ef4444'
+                        }}
+                      >
+                        <LogOut size={16} />
+                        Logout
+                      </Dropdown.Item>
+                    </Dropdown.Menu>
+                  </Dropdown>
+                </motion.div>
+              ) : (
+                <>
+                  <motion.div
+                    initial={{ opacity: 0, scale: 0.8 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ delay: 0.7 }}
+                    style={{ marginLeft: '0.5rem' }}
+                  >
+                    <Nav.Link
+                      as={Link}
+                      to="/login"
+                      style={{
+                        color: '#6b7280',
+                        fontWeight: '600',
+                        textDecoration: 'none',
+                        padding: 'clamp(0.5rem, 1.5vw, 0.75rem) clamp(0.75rem, 2vw, 1rem)',
+                        borderRadius: '12px',
+                        transition: 'all 0.3s ease',
+                        fontSize: 'clamp(0.9rem, 2vw, 1rem)'
+                      }}
+                      onMouseEnter={(e) => {
+                        e.target.style.backgroundColor = 'rgba(107, 114, 128, 0.1)';
+                        e.target.style.color = '#374151';
+                      }}
+                      onMouseLeave={(e) => {
+                        e.target.style.backgroundColor = 'transparent';
+                        e.target.style.color = '#6b7280';
+                      }}
+                    >
+                      Login
+                    </Nav.Link>
+                  </motion.div>
+                  
+                  <motion.div
+                    initial={{ opacity: 0, scale: 0.8 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ delay: 0.75 }}
+                    style={{ marginLeft: '0.5rem' }}
+                  >
+                    <Button
+                      as={Link}
+                      to="/signup"
+                      variant="outline-primary"
+                      style={{
+                        borderRadius: '50px',
+                        padding: 'clamp(0.5rem, 1.5vw, 0.75rem) clamp(1rem, 2.5vw, 1.5rem)',
+                        fontWeight: '600',
+                        fontSize: 'clamp(0.85rem, 1.8vw, 0.95rem)',
+                        transition: 'all 0.3s ease',
+                        textDecoration: 'none'
+                      }}
+                    >
+                      Sign Up
+                    </Button>
+                  </motion.div>
+                </>
+              )}
+              
               {/* CTA Button */}
               <motion.div
                 initial={{ opacity: 0, scale: 0.8 }}
                 animate={{ opacity: 1, scale: 1 }}
                 transition={{ delay: 0.8 }}
-                style={{ marginLeft: '1rem' }}
+                style={{ marginLeft: '0.5rem' }}
               >
                 <Button
                   as={Link}
@@ -386,12 +516,94 @@ const Header = () => {
                   transition={{ delay: 0.6 }}
                   style={{ marginTop: '1rem' }}
                 >
+                  {customer ? (
+                    <>
+                      <div className="text-center mb-3 p-3" style={{ background: 'rgba(59, 130, 246, 0.1)', borderRadius: '12px' }}>
+                        <User size={24} className="text-primary mb-2" />
+                        <div className="fw-bold">{customer.name || customer.email.split('@')[0]}</div>
+                        <small className="text-muted">{customer.email}</small>
+                      </div>
+                      <Button
+                        as={Link}
+                        to="/my-orders"
+                        onClick={() => setIsMenuOpen(false)}
+                        variant="outline-primary"
+                        style={{
+                          borderRadius: '12px',
+                          padding: '0.75rem 1rem',
+                          fontWeight: '600',
+                          width: '100%',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          gap: '0.5rem',
+                          marginBottom: '0.5rem'
+                        }}
+                      >
+                        <ShoppingBag size={16} />
+                        My Orders
+                      </Button>
+                      <Button
+                        onClick={() => {
+                          logout();
+                          setIsMenuOpen(false);
+                        }}
+                        variant="outline-danger"
+                        style={{
+                          borderRadius: '12px',
+                          padding: '0.75rem 1rem',
+                          fontWeight: '600',
+                          width: '100%',
+                          display: 'flex',
+                          alignItems: 'center',
+                          justifyContent: 'center',
+                          gap: '0.5rem',
+                          marginBottom: '1rem'
+                        }}
+                      >
+                        <LogOut size={16} />
+                        Logout
+                      </Button>
+                    </>
+                  ) : (
+                    <div className="d-flex gap-2 mb-3">
+                      <Button
+                        as={Link}
+                        to="/login"
+                        onClick={() => setIsMenuOpen(false)}
+                        variant="outline-primary"
+                        style={{
+                          borderRadius: '12px',
+                          padding: '0.75rem 1.5rem',
+                          fontWeight: '600',
+                          flex: 1
+                        }}
+                      >
+                        Login
+                      </Button>
+                      <Button
+                        as={Link}
+                        to="/signup"
+                        onClick={() => setIsMenuOpen(false)}
+                        style={{
+                          background: 'linear-gradient(135deg, #3b82f6, #2563eb)',
+                          border: 'none',
+                          borderRadius: '12px',
+                          padding: '0.75rem 1.5rem',
+                          fontWeight: '600',
+                          flex: 1
+                        }}
+                      >
+                        Sign Up
+                      </Button>
+                    </div>
+                  )}
                   <Button
                     as={Link}
                     to="/contact"
                     onClick={() => setIsMenuOpen(false)}
                     style={{
-                      background: 'linear-gradient(135deg, #3b82f6, #2563eb)',
+                      background: 'linear-gradient(135deg, #10b981, #059669)',
                       border: 'none',
                       borderRadius: '12px',
                       padding: '1rem',

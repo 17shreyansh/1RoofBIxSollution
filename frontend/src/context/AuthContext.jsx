@@ -15,18 +15,23 @@ export const useAuth = () => {
 
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
+  const [customer, setCustomer] = useState(null);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const token = localStorage.getItem('token');
+    const customerToken = localStorage.getItem('customerToken');
+    
     if (token) {
-      verifyToken();
+      verifyAdminToken();
+    } else if (customerToken) {
+      verifyCustomerToken();
     } else {
       setLoading(false);
     }
   }, []);
 
-  const verifyToken = async () => {
+  const verifyAdminToken = async () => {
     try {
       const response = await api.get('/auth/verify');
       setUser(response.data.user);
@@ -37,7 +42,20 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
-  const login = async (email, password) => {
+  const verifyCustomerToken = async () => {
+    try {
+      const response = await api.get('/customer/profile', {
+        headers: { Authorization: `Bearer ${localStorage.getItem('customerToken')}` }
+      });
+      setCustomer(response.data);
+    } catch (error) {
+      localStorage.removeItem('customerToken');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const adminLogin = async (email, password) => {
     try {
       const response = await api.post('/auth/login', { email, password });
       const { token, user } = response.data;
@@ -50,17 +68,41 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  const customerLogin = async (email, password) => {
+    try {
+      const response = await api.post('/customer/login', { email, password });
+      const { token, customer } = response.data;
+      
+      localStorage.setItem('customerToken', token);
+      setCustomer(customer);
+      return { success: true };
+    } catch (error) {
+      throw new Error(error.response?.data?.message || 'Login failed');
+    }
+  };
+
+  const setCustomerFromPayment = (token, customerData) => {
+    localStorage.setItem('customerToken', token);
+    setCustomer(customerData);
+  };
+
   const logout = () => {
     localStorage.removeItem('token');
+    localStorage.removeItem('customerToken');
     setUser(null);
+    setCustomer(null);
   };
 
   const value = {
     user,
-    login,
+    customer,
+    adminLogin,
+    customerLogin,
+    setCustomerFromPayment,
     logout,
     loading,
-    isAuthenticated: !!user
+    isAdminAuthenticated: !!user,
+    isCustomerAuthenticated: !!customer
   };
 
   return (

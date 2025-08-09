@@ -374,6 +374,8 @@ const ServiceDetail = () => {
                     </div>
                     
                     <Button
+                      as={Link}
+                      to={`/checkout/${service.slug}/${planType}`}
                       style={{
                         width: '100%',
                         background: planType === 'standard' 
@@ -385,7 +387,8 @@ const ServiceDetail = () => {
                         padding: '0.875rem 1.5rem',
                         fontWeight: '600',
                         fontSize: '1rem',
-                        transition: 'all 0.3s ease'
+                        transition: 'all 0.3s ease',
+                        textDecoration: 'none'
                       }}
                       onMouseEnter={(e) => {
                         if (planType !== 'standard') {
@@ -402,7 +405,7 @@ const ServiceDetail = () => {
                         e.target.style.transform = 'translateY(0)';
                       }}
                     >
-                      Get Started
+                      Buy Now - {formatPrice(plan.price)}
                     </Button>
                   </Card>
                 </motion.div>
